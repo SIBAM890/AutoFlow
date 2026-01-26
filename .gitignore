@@ -45,3 +45,5 @@ env/
 # Temporary files
 tmp/
 temp/
+auth_info_baileys/
+backend/auth_info_baileys/
