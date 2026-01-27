@@ -2,8 +2,8 @@ const aiService = require('../services/ai.service');
 
 exports.createWorkflow = async (req, res) => {
     try {
-        const { userPrompt } = req.body;
-        const workflow = await aiService.generateWorkflow(userPrompt);
+        const { userPrompt, fileContext } = req.body;
+        const workflow = await aiService.generateWorkflow(userPrompt, fileContext);
         res.json({ success: true, workflow });
     } catch (error) {
         res.status(500).json({ error: error.message });

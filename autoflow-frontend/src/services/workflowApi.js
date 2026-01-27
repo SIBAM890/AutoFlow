@@ -2,8 +2,18 @@ import api from './api';
 
 export const workflowApi = {
     // Generate a workflow from a text description
-    generate: async (description) => {
-        const response = await api.post('/generate-workflow', { userPrompt: description });
+    generate: async (description, fileContext = null) => {
+        const response = await api.post('/generate-workflow', { userPrompt: description, fileContext });
+        return response.data;
+    },
+
+    // Upload a file for context
+    uploadFile: async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await api.post('/upload', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
         return response.data;
     },
 

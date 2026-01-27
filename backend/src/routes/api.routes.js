@@ -1,29 +1,40 @@
 const express = require('express');
 const router = express.Router();
 const workflowController = require('../controllers/workflow.controller');
-const engineService = require('../services/engine.service'); // Import Engine
+const uploadController = require('../controllers/upload.controller');
+const engineService = require('../services/engine.service');
 
 // AI Routes
 router.post('/generate-workflow', workflowController.createWorkflow);
 router.post('/explain-workflow', workflowController.explainWorkflow);
 
-// ✅ SIMULATION ROUTE (The Test Bridge)
+// File Upload Route
+router.post('/upload', uploadController.uploadFile);
+
+// Simulation Route (Test Bridge)
 router.post('/simulate-message', async (req, res) => {
-    const { message } = req.body;
-    let botReply = "";
+    try {
+        const { message } = req.body;
+        // Mock WhatsApp socket
+        let botReply = "No reply generated.";
+        const mockSock = {
+            sendMessage: async (jid, content) => {
+                botReply = content.text;
+                console.log("🤖 Simulated Reply:", botReply);
+            }
+        };
 
-    // MOCK SOCKET: Pretends to be WhatsApp
-    const mockSock = {
-        sendMessage: async (sender, content) => {
-            botReply = content.text; // Capture the reply
-        }
-    };
+        // Run engine logic
+        await engineService.processMessage(mockSock, "TestUser", {
+            messages: [{ key: { remoteJid: "TestUser" }, message: { conversation: message } }],
+            type: "notify"
+        });
 
-    // Run the real engine logic
-    await engineService.processMessage(mockSock, "TestUser", message);
-
-    // Send the captured reply back to Frontend
-    res.json({ success: true, reply: botReply });
+        res.json({ success: true, reply: botReply });
+    } catch (error) {
+        console.error("Simulation Error:", error);
+        res.status(500).json({ error: "Simulation failed" });
+    }
 });
 
 module.exports = router;

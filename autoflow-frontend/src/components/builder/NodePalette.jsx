@@ -1,25 +1,65 @@
-import { useState } from 'react';
-import { Search, MessageSquare, Zap, Divide, MousePointerClick, ChevronRight, ChevronDown, CheckCircle, Link, Mail, Smartphone, Database, ShoppingCart, Globe, CreditCard, Users, Code, Cloud, Clock, Bot, Facebook, Twitter, Instagram, Linkedin, Slack, Github, Trello, Calendar } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Search, MessageSquare, Zap, Divide, MousePointerClick, ChevronRight, ChevronDown, CheckCircle, Link, Mail, Smartphone, Database, ShoppingCart, Globe, CreditCard, Users, Code, Cloud, Clock, Bot, Facebook, Twitter, Instagram, Linkedin, Slack, Github, Trello, Calendar, Activity, AlertTriangle, Shield, Key, HardDrive, FileText, BarChart, Layout, GitBranch, Video, DollarSign, Send, MessageCircle, Headphones, Flame, Box } from 'lucide-react';
 import { TOOL_CATEGORIES } from '../../constants/tools';
+import toolsData from '../../data/tools.json'; // Import the 500+ tools
 import clsx from 'clsx';
 
-// Icon mapping helper
+// Extended Icon Map
 const IconMap = {
     MessageSquare, Zap, Divide, Link, Mail, Smartphone, Database, ShoppingCart,
     Globe, CreditCard, Users, Code, Cloud, Clock, Bot, Facebook, Twitter,
-    Instagram, Linkedin, Slack, Github, Trello, Calendar
+    Instagram, Linkedin, Slack, Github, Trello, Calendar, Activity, AlertTriangle,
+    Shield, Key, HardDrive, FileText, BarChart, Layout, GitBranch, Video,
+    DollarSign, Send, MessageCircle, Headphones, Flame, Box
 };
 
 export const NodePalette = () => {
     const [searchQuery, setSearchQuery] = useState('');
-    const [expandedCategories, setExpandedCategories] = useState(['core', 'communication']);
+    const [expandedCategories, setExpandedCategories] = useState(['core']);
+
+    // Merge Core Logic with 500+ Tools dynamically
+    const allCategories = useMemo(() => {
+        // 1. Get Core Logic (Triggers, Conditions, etc.)
+        const coreLogic = TOOL_CATEGORIES[0];
+
+        // 2. Group toolsData by category
+        const groupedTools = {};
+        toolsData.forEach(tool => {
+            if (!groupedTools[tool.category]) {
+                groupedTools[tool.category] = [];
+            }
+            // Normalize tool object to match palette expectations
+            groupedTools[tool.category].push({
+                id: tool.id,
+                label: tool.name,
+                type: 'tool', // All library items are 'tool' type nodes
+                icon: tool.icon
+            });
+        });
+
+        // 3. Convert groups to array format
+        const dynamicCategories = Object.keys(groupedTools).sort().map(catName => ({
+            id: catName.toLowerCase().replace(/\s+/g, '_'),
+            name: catName,
+            tools: groupedTools[catName]
+        }));
+
+        // 4. Return combined list
+        return [coreLogic, ...dynamicCategories];
+    }, []);
 
     const onDragStart = (event, tool) => {
-        // Pass strictly the type expected by WorkflowGraph logic
-        // We send 'custom' as primary type logic, but we need to encode specificity
-        // Actually WorkflowGraph uses the string directly as type/label logic
-        // Let's pass the 'id' which is like 'whatsapp', 'gmail'
+        // Pass tool data. For generic tools, we might need to pass more than just ID if the node needs label/icon.
+        // We'll pass the whole object as JSON string for sophisticated drops, or just ID.
+        // ReactFlow standard DND uses 'application/reactflow' with a type string.
+        // But our Drop handler likely needs to know *which* tool.
+        // Let's pass a JSON string so the drop handler (if updated) can read it, 
+        // OR we stick to the existing ID logic. 
+        // The existing logic probably uses exact ID matches? 
+        // Actually the Drop logic in WorkflowGraph likely creates a node based on this type.
+        // We'll trust the ID flow for now, but prefixing might be safer logic-wise later.
         event.dataTransfer.setData('application/reactflow', tool.id);
+        event.dataTransfer.setData('application/toolData', JSON.stringify(tool)); // Extra data if needed
         event.dataTransfer.effectAllowed = 'move';
     };
 
@@ -29,8 +69,8 @@ export const NodePalette = () => {
         );
     };
 
-    // Filter tools based on search
-    const filteredCategories = TOOL_CATEGORIES.map(cat => ({
+    // Filter categories based on search
+    const filteredCategories = allCategories.map(cat => ({
         ...cat,
         tools: cat.tools.filter(tool =>
             tool.label.toLowerCase().includes(searchQuery.toLowerCase())
@@ -44,7 +84,7 @@ export const NodePalette = () => {
             <div className="p-4 border-b border-gray-100 bg-gray-50">
                 <div className="text-sm font-bold text-gray-800 uppercase tracking-wider mb-2 flex items-center gap-2">
                     Toolbox
-                    <span className="bg-purple-100 text-purple-600 text-[10px] py-0.5 px-2 rounded-full">100+</span>
+                    <span className="bg-purple-100 text-purple-600 text-[10px] py-0.5 px-2 rounded-full">500+</span>
                 </div>
                 <div className="relative">
                     <Search className="absolute left-3 top-2.5 text-gray-400" size={16} />

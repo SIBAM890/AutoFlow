@@ -3,72 +3,169 @@ require('dotenv').config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-exports.generateWorkflow = async (userPrompt) => {
-  console.log("🤖 AI Service: Generating workflow for:", userPrompt);
+/**
+ * Validate workflow structure
+ */
+function validateWorkflow(parsed) {
+  // Support both wrappers
+  const nodes = parsed.nodes || parsed.steps || parsed.workflow?.nodes;
+  
+  if (!nodes || !Array.isArray(nodes)) {
+    throw new Error("Invalid structure: Missing 'nodes' or 'steps' array");
+  }
+  
+  return nodes;
+}
 
-  try {
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
-
-    const prompt = `
-        You are an automation builder.
-        The user describes a workflow.
-
-        Your job: ALWAYS output VALID JSON ONLY.
-
-        Format:
-        {
-          "trigger": "whatsapp_message",
-          "steps": [
-            { "id": "1", "type": "trigger", "data": { "label": "Message Received" }, "position": { "x": 250, "y": 0 } },
-            { "id": "2", "type": "action", "data": { "label": "Analyze Intent" }, "position": { "x": 250, "y": 100 } },
-            { "id": "3", "type": "condition", "data": { "label": "Is Product Inquiry?" }, "position": { "x": 250, "y": 200 } },
-            { "id": "4", "type": "action", "data": { "label": "Reply with Price" }, "position": { "x": 250, "y": 300 } }
-          ]
+/**
+ * Generate fallback workflow when AI fails
+ */
+function generateFallbackWorkflow(reason = "System Busy") {
+  return {
+    nodes: [
+      {
+        id: "1",
+        type: "trigger",
+        position: { x: 100, y: 100 },
+        data: {
+          label: "Message Received",
+          triggerType: "whatsapp_message",
+          config: { platform: "whatsapp" }
         }
-
-        If the user text is unclear, still guess the most likely workflow.
-        NEVER output text outside JSON.
-        User said: "${userPrompt}"
-        `;
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-
-    console.log("🤖 AI Raw Response:", text);
-
-    // Clean up markdown code blocks if Gemini adds them
-    const cleanJson = text.replace(/```json/g, "").replace(/```/g, "").trim();
-
-    try {
-      const parsed = JSON.parse(cleanJson);
-      // Ensure "steps" exists for React Flow
-      if (!parsed.steps) {
-        parsed.steps = [];
+      },
+      {
+        id: "2",
+        type: "action",
+        position: { x: 400, y: 100 },
+        data: {
+          label: "Automated Reply",
+          actionType: "send_whatsapp",
+          config: {
+            recipient: "{{trigger.from}}",
+            message: `Service Temporarily unavailable. Reason: ${reason}`
+          }
+        }
       }
-      return parsed;
-    } catch (parseError) {
-      console.error("❌ JSON Parse Failed. Raw text:", cleanJson);
-      throw new Error("AI returned invalid JSON");
-    }
+    ]
+  };
+}
 
-  } catch (error) {
-    console.error("❌ AI Service Error:", error);
-    // Fallback workflow so UI doesn't break
-    return {
-      trigger: "whatsapp_message",
-      steps: [
-        { id: "1", type: "trigger", data: { label: "Message Received" }, position: { x: 250, y: 0 } },
-        { id: "2", type: "action", data: { label: "AI Error - Default Flow" }, position: { x: 250, y: 100 } }
-      ]
-    };
+exports.generateWorkflow = async (userPrompt, fileContext = "") => {
+  console.log("🤖 AI Service: Generating workflow for:", userPrompt);
+  
+  // Safe extraction of inventory data
+  const inventoryData = fileContext?.preview || fileContext?.data || null;
+  const inventoryColumns = fileContext?.columns || 
+    (inventoryData && inventoryData.length > 0 ? Object.keys(inventoryData[0]) : []);
+    
+  // Sample data for AI context
+  const sampleData = inventoryData ? inventoryData.slice(0, 3) : [];
+  
+  if (fileContext) {
+     console.log("📂 With File Context:", inventoryColumns.join(', '));
+  }
+
+  // ⚡ USE FLASH MODEL FOR SPEED (As requested)
+  // Fallback to pro if flash fails
+  const modelsToTry = ["gemini-flash-latest", "gemini-1.5-flash", "gemini-pro"];
+
+  for (const modelName of modelsToTry) {
+    try {
+      console.log(`🔄 Attempting Model: ${modelName}...`);
+      const model = genAI.getGenerativeModel({ model: modelName });
+
+      const prompt = `
+      Act as an Automation Architect. 
+      Generate a JSON workflow for: "${userPrompt}"
+      
+      CONTEXT:
+      ${sampleData.length > 0 ? `
+      - INVENTORY COLUMNS: ${inventoryColumns.join(', ')}
+      - SAMPLE DATA: ${JSON.stringify(sampleData)}
+      (Use 'condition' nodes to check Stock/Price if relevant)
+      ` : ''}
+      
+      RULES:
+      1. Create a LOGICAL FLOW (Step 1 -> Step 2 -> Step 3).
+      2. Every node MUST detect its target using:
+         - "next": ["target_id"] (For standard actions)
+         - "true_id": "target_id", "false_id": "target_id" (For conditions)
+         - "outputs": { "intent": "target_id" } (For AI Agents)
+      3. Do NOT connect everything to the Start node. Chain them!
+      
+      STRICT OUTPUT format (JSON ONLY):
+      {
+        "nodes": [
+           { 
+             "id": "1", 
+             "type": "trigger", 
+             "data": { "label": "Start" },
+             "next": ["2"] 
+           },
+           {
+             "id": "2",
+             "type": "ai_agent", 
+             "data": { "label": "Detect Intent", "outputs": { "price": "3", "stock": "4" } }
+           },
+           {
+             "id": "3", 
+             "type": "action", 
+             "data": { "label": "Check Price" },
+             "next": ["5"]
+           }
+           // ... more nodes
+        ]
+      }
+      
+      Generate now.
+      `.trim();
+
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      
+      console.log(`✅ ${modelName} Success. Length:`, text.length);
+
+      // Clean JSON
+      const cleanJson = text.replace(/```json/g, "").replace(/```/g, "").trim();
+      const parsed = JSON.parse(cleanJson);
+      
+      const nodes = validateWorkflow(parsed);
+      
+      return { nodes };
+
+    } catch (error) {
+      console.warn(`⚠️ ${modelName} Failed:`, error.message);
+      if (modelName === modelsToTry[modelsToTry.length - 1]) {
+        console.error("❌ All models failed.");
+        return generateFallbackWorkflow();
+      }
+    }
   }
 };
 
 exports.explainWorkflow = async (workflowJson) => {
-  const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
-  const prompt = `Explain this workflow in simple, human language with emojis:\n${JSON.stringify(workflowJson)}`;
-
-  const result = await model.generateContent(prompt);
-  return result.response.text();
+  // ⚡ Simple Text Explanation (Prevents Frontend Crash)
+  try {
+      const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+      const prompt = `
+      Analyze this workflow and explain it in simple terms.
+      
+      Workflow: ${JSON.stringify(workflowJson).substring(0, 2000)}
+      
+      RULES:
+      1. Output PLAIN TEXT only. Do NOT output a JSON object.
+      2. Use bullet points and emojis.
+      3. Keep it brief (max 3-4 lines).
+      `.trim();
+    
+      const result = await model.generateContent(prompt);
+      const text = result.response.text();
+      // Double cleaning just in case
+      const cleanText = text.replace(/```json/g, "").replace(/```/g, "").replace(/^{"explanation":/g, "").replace(/}$/g, "").trim();
+      
+      return { explanation: cleanText };
+  } catch (e) {
+      return { explanation: "AI could not generate explanation." };
+  }
 };

@@ -18,8 +18,27 @@ export const AIExplanation = ({ workflow }) => {
         setIsLoading(true);
         try {
             const data = await workflowApi.explain(workflow);
-            setExplanation(data.explanation || "No explanation available.");
+            // Handle structured response
+            let explanationText = "No explanation available.";
+
+            if (typeof data === 'string') {
+                explanationText = data;
+            } else if (typeof data === 'object') {
+                if (data.summary) {
+                    const stepsText = data.steps?.map(s => `• ${s.title}: ${s.description}`).join('\n') || '';
+                    explanationText = `${data.summary}\n\n${stepsText}`;
+                } else if (data.explanation) {
+                    explanationText = typeof data.explanation === 'string'
+                        ? data.explanation
+                        : JSON.stringify(data.explanation);
+                } else {
+                    explanationText = JSON.stringify(data, null, 2);
+                }
+            }
+
+            setExplanation(explanationText);
         } catch (error) {
+            console.error(error);
             setExplanation("Failed to generate explanation.");
         } finally {
             setIsLoading(false);
@@ -57,7 +76,7 @@ export const AIExplanation = ({ workflow }) => {
                                 </div>
                             ) : (
                                 <div className="whitespace-pre-line">
-                                    {explanation}
+                                    {typeof explanation === 'object' ? JSON.stringify(explanation) : explanation}
                                 </div>
                             )}
                         </div>
