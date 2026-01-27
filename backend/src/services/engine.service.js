@@ -11,13 +11,20 @@ let activeWorkflow = {
 };
 
 exports.processMessage = async (sock, sender, messageText) => {
+    // 0. SAFETY: Ensure message is a string
+    if (typeof messageText !== 'string') {
+        console.warn("⚠️ Engine received non-string message:", messageText);
+        messageText = JSON.stringify(messageText) || "";
+    }
+
     console.log(`⚙️ Engine Processing: "${messageText}"`);
 
-    const lowerMsg = messageText.toLowerCase();
+    const lowerMsg = messageText.toLowerCase().trim();
     let replyText = "";
 
-    // 1. HANDLE GREETINGS
-    if (lowerMsg === "hi" || lowerMsg === "hello" || lowerMsg === "hy" || lowerMsg === "hey") {
+    // 1. HANDLE GREETINGS (Expanded)
+    const greetings = ["hi", "hello", "hy", "hey", "hyy", "hlo", "hola", "start"];
+    if (greetings.includes(lowerMsg)) {
         await sock.sendMessage(sender, { text: "👋 Hi there! I'm AutoFlow AI.\n\nYou can ask:\n- List all products\n- Price of Red Lipstick\n- Track order" });
         return;
     }

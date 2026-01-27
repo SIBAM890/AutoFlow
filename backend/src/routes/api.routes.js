@@ -25,10 +25,7 @@ router.post('/simulate-message', async (req, res) => {
         };
 
         // Run engine logic
-        await engineService.processMessage(mockSock, "TestUser", {
-            messages: [{ key: { remoteJid: "TestUser" }, message: { conversation: message } }],
-            type: "notify"
-        });
+        await engineService.processMessage(mockSock, "TestUser", message);
 
         res.json({ success: true, reply: botReply });
     } catch (error) {
