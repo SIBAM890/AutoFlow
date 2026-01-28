@@ -22,6 +22,21 @@
     <div class="bg-glow bg-glow-1"></div>
     <div class="bg-glow bg-glow-2"></div>
 
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-brand">
+                <img src="logo.png" alt="AutoFlow Logo" class="logo-img">
+                <span class="logo-text">AutoFlow</span>
+            </a>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#pricing" class="nav-link">Pricing</a>
+                <button class="nav-btn">Login</button>
+            </div>
+        </div>
+    </nav>
+
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-container">
@@ -137,14 +152,14 @@
                                 <stop offset="100%" style="stop-color:#0066FF;stop-opacity:0" />
                             </linearGradient>
                         </defs>
-                        <path id="line-1" class="workflow-line-path" d="M 100 80 L 200 120" stroke="url(#lineGradient)"
+                        <path id="line-1" class="workflow-line-path" d="M 50 40 L 90 90" stroke="url(#lineGradient)"
                             stroke-width="2" fill="none" stroke-dasharray="5,5" />
-                        <path id="line-2" class="workflow-line-path" d="M 200 140 L 280 200" stroke="url(#lineGradient)"
+                        <path id="line-2" class="workflow-line-path" d="M 90 120 L 60 220" stroke="url(#lineGradient)"
                             stroke-width="2" fill="none" stroke-dasharray="5,5" />
-                        <path id="line-3" class="workflow-line-path" d="M 300 220 L 380 260" stroke="url(#lineGradient)"
+                        <path id="line-3" class="workflow-line-path" d="M 80 260 L 140 310" stroke="url(#lineGradient)"
                             stroke-width="2" fill="none" stroke-dasharray="5,5" />
-                        <path id="line-4" class="workflow-line-path" d="M 400 280 L 480 240" stroke="url(#lineGradient)"
-                            stroke-width="2" fill="none" stroke-dasharray="5,5" />
+                        <path id="line-4" class="workflow-line-path" d="M 160 330 Q 300 380 540 320"
+                            stroke="url(#lineGradient)" stroke-width="2" fill="none" stroke-dasharray="5,5" />
                     </svg>
                 </div>
 
@@ -261,17 +276,21 @@
         </div>
     </section>
 
-    <!-- Problem Section -->
-    <section class="problem-section">
-        <div class="problem-container">
-            <h2 class="problem-headline">Stop drowning in customer messages</h2>
+    <!-- Comparison Section -->
+    <section class="comparison-section">
+        <div class="comparison-container">
+            <h2 class="comparison-headline">Stop
+                drowning in support messages</h2>
 
             <!-- Split Screen Comparison -->
             <div class="split-comparison">
-                <!-- Left Side: Current Reality (Chaos) -->
+                <!-- Left Side: Current Reality -->
                 <div class="comparison-side chaos-side">
                     <div class="side-label">
-                        <span class="label-icon">😰</span>
+                        <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
                         <span class="label-text">Current Reality</span>
                     </div>
 
@@ -279,7 +298,10 @@
                         <!-- Notification Stack -->
                         <div class="notification-stack">
                             <div class="notification-item" data-delay="0">
-                                <div class="notif-icon">💬</div>
+                                <svg class="notif-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" />
+                                </svg>
                                 <div class="notif-content">
                                     <span class="notif-name">Rahul K.</span>
                                     <span class="notif-msg">Where is my order?</span>
@@ -287,58 +309,57 @@
                                 <span class="notif-time">2h ago</span>
                             </div>
                             <div class="notification-item" data-delay="200">
-                                <div class="notif-icon">💬</div>
+                                <svg class="notif-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" />
+                                </svg>
                                 <div class="notif-content">
                                     <span class="notif-name">Priya S.</span>
-                                    <span class="notif-msg">Need refund ASAP!</span>
+                                    <span class="notif-msg">Refund needed ASAP!</span>
                                 </div>
                                 <span class="notif-time">3h ago</span>
                             </div>
-                            <div class="notification-item" data-delay="400">
-                                <div class="notif-icon">💬</div>
-                                <div class="notif-content">
-                                    <span class="notif-name">Amit P.</span>
-                                    <span class="notif-msg">This is unacceptable!</span>
-                                </div>
-                                <span class="notif-time">4h ago</span>
-                            </div>
-                            <div class="notification-item" data-delay="600">
-                                <div class="notif-icon">💬</div>
-                                <div class="notif-content">
-                                    <span class="notif-name">Sneha M.</span>
-                                    <span class="notif-msg">Still waiting...</span>
-                                </div>
-                                <span class="notif-time">5h ago</span>
-                            </div>
-                            <div class="notification-badge">+47 more</div>
+                            <div class="notification-badge">+47 other chats waiting</div>
                         </div>
 
-                        <!-- Ticking Clock -->
-                        <div class="chaos-metric">
-                            <div class="metric-icon">⏰</div>
-                            <div class="metric-value" id="chaos-time">2-4 hours</div>
-                            <div class="metric-label">Response Time</div>
-                        </div>
-
-                        <!-- Money Lost Counter -->
-                        <div class="chaos-metric">
-                            <div class="metric-icon">💸</div>
-                            <div class="metric-value" id="chaos-cost">₹15,000/mo</div>
-                            <div class="metric-label">Support Cost</div>
+                        <div class="metrics-row">
+                            <div class="chaos-metric">
+                                <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M12 6v6l4 2" />
+                                </svg>
+                                <div class="metric-info">
+                                    <div class="metric-value">2-4 hrs</div>
+                                    <div class="metric-label">Response Time</div>
+                                </div>
+                            </div>
+                            <div class="chaos-metric">
+                                <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+                                </svg>
+                                <div class="metric-info">
+                                    <div class="metric-value">₹15k/mo</div>
+                                    <div class="metric-label">Support Cost</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Divider with VS -->
+                <!-- Vertical Divider -->
                 <div class="comparison-divider">
                     <div class="vs-badge">VS</div>
                     <div class="divider-line"></div>
                 </div>
 
-                <!-- Right Side: With AgentFlow (Solution) -->
+                <!-- Right Side: With AgentFlow -->
                 <div class="comparison-side solution-side">
                     <div class="side-label">
-                        <span class="label-icon">✨</span>
+                        <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
                         <span class="label-text">With AgentFlow</span>
                     </div>
 
@@ -346,7 +367,10 @@
                         <!-- Resolved Messages -->
                         <div class="resolved-stack">
                             <div class="resolved-item" data-delay="0">
-                                <div class="resolved-icon">✅</div>
+                                <svg class="resolved-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14M22 4L12 14.01l-3-3" />
+                                </svg>
                                 <div class="resolved-content">
                                     <span class="resolved-name">Rahul K.</span>
                                     <span class="resolved-msg">Order status sent</span>
@@ -354,67 +378,51 @@
                                 <span class="resolved-time">2.3s</span>
                             </div>
                             <div class="resolved-item" data-delay="200">
-                                <div class="resolved-icon">✅</div>
+                                <svg class="resolved-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14M22 4L12 14.01l-3-3" />
+                                </svg>
                                 <div class="resolved-content">
                                     <span class="resolved-name">Priya S.</span>
                                     <span class="resolved-msg">Refund processed</span>
                                 </div>
                                 <span class="resolved-time">1.8s</span>
                             </div>
-                            <div class="resolved-item" data-delay="400">
-                                <div class="resolved-icon">✅</div>
-                                <div class="resolved-content">
-                                    <span class="resolved-name">Amit P.</span>
-                                    <span class="resolved-msg">Issue resolved</span>
+                            <div class="happy-customers">
+                                <div class="customer-avatars">
+                                    <div class="avatar"><span>S</span></div>
+                                    <div class="avatar"><span>A</span></div>
+                                    <div class="avatar"><span>M</span></div>
+                                    <div class="avatar-plus">+1k</div>
                                 </div>
-                                <span class="resolved-time">2.1s</span>
-                            </div>
-                            <div class="resolved-item" data-delay="600">
-                                <div class="resolved-icon">✅</div>
-                                <div class="resolved-content">
-                                    <span class="resolved-name">Sneha M.</span>
-                                    <span class="resolved-msg">Update provided</span>
-                                </div>
-                                <span class="resolved-time">1.9s</span>
-                            </div>
-                            <div class="happy-reactions">
-                                <span class="reaction">😊</span>
-                                <span class="reaction">👍</span>
-                                <span class="reaction">❤️</span>
-                                <span class="reaction">🎉</span>
+                                <span class="happy-text">Delighted customers</span>
                             </div>
                         </div>
 
-                        <!-- Fast Response -->
-                        <div class="solution-metric">
-                            <div class="metric-icon">⚡</div>
-                            <div class="metric-value" id="solution-time">2.3 seconds</div>
-                            <div class="metric-label">Response Time</div>
-                        </div>
-
-                        <!-- Money Saved Counter -->
-                        <div class="solution-metric">
-                            <div class="metric-icon">💰</div>
-                            <div class="metric-value" id="solution-cost">₹0/mo</div>
-                            <div class="metric-label">Support Cost</div>
+                        <div class="metrics-row">
+                            <div class="solution-metric">
+                                <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                <div class="metric-info">
+                                    <div class="metric-value">2.3 secs</div>
+                                    <div class="metric-label">Response Time</div>
+                                </div>
+                            </div>
+                            <div class="solution-metric">
+                                <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path
+                                        d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" />
+                                </svg>
+                                <div class="metric-info">
+                                    <div class="metric-value">₹0/mo</div>
+                                    <div class="metric-label">Support Cost</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Stats That Fade In -->
-            <div class="problem-stats">
-                <div class="stat-item" data-stat="1">
-                    <div class="stat-number">100+</div>
-                    <div class="stat-text">WhatsApp queries daily</div>
-                </div>
-                <div class="stat-item" data-stat="2">
-                    <div class="stat-number">2-4 hours</div>
-                    <div class="stat-text">Manual response time</div>
-                </div>
-                <div class="stat-item" data-stat="3">
-                    <div class="stat-number">₹15,000/mo</div>
-                    <div class="stat-text">Cost in support staff</div>
                 </div>
             </div>
         </div>
@@ -474,39 +482,68 @@
                             </div>
                         </div>
                         <div class="builder-canvas">
+                            <!-- Connection lines (Moved behind nodes) -->
+                            <svg class="build-connections" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                <path class="build-line" data-line="1" d="M 15 28.5 L 45 28.5" stroke="#00D9FF"
+                                    stroke-width="0.5" fill="none" />
+                                <path class="build-line" data-line="2" d="M 45 28.5 L 30 58.5" stroke="#00D9FF"
+                                    stroke-width="0.5" fill="none" />
+                                <path class="build-line" data-line="3" d="M 30 58.5 L 60 58.5" stroke="#00D9FF"
+                                    stroke-width="0.5" fill="none" />
+                                <path class="build-line" data-line="4" d="M 60 58.5 L 75 43.5" stroke="#00D9FF"
+                                    stroke-width="0.5" fill="none" />
+                            </svg>
+
                             <!-- Workflow nodes that draw themselves -->
                             <div class="build-node" data-node="1" style="top: 20%; left: 10%;">
-                                <div class="build-node-icon">📥</div>
+                                <div class="build-node-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path
+                                            d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                        <path d="M22 6l-10 7L2 6" />
+                                    </svg>
+                                </div>
                                 <span class="build-node-label">Receive Message</span>
                             </div>
                             <div class="build-node" data-node="2" style="top: 20%; left: 40%;">
-                                <div class="build-node-icon">🤖</div>
+                                <div class="build-node-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" />
+                                        <path d="M12 8v2" />
+                                        <path d="M4 10h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10z" />
+                                        <path d="M9 14h6" />
+                                    </svg>
+                                </div>
                                 <span class="build-node-label">AI Analysis</span>
                             </div>
                             <div class="build-node" data-node="3" style="top: 50%; left: 25%;">
-                                <div class="build-node-icon">🗄️</div>
+                                <div class="build-node-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <ellipse cx="12" cy="5" rx="9" ry="3" />
+                                        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                                        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                                    </svg>
+                                </div>
                                 <span class="build-node-label">Query Data</span>
                             </div>
                             <div class="build-node" data-node="4" style="top: 50%; left: 55%;">
-                                <div class="build-node-icon">✍️</div>
+                                <div class="build-node-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                    </svg>
+                                </div>
                                 <span class="build-node-label">Format Reply</span>
                             </div>
                             <div class="build-node" data-node="5" style="top: 35%; left: 70%;">
-                                <div class="build-node-icon">📤</div>
+                                <div class="build-node-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="22" y1="2" x2="11" y2="13" />
+                                        <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                                    </svg>
+                                </div>
                                 <span class="build-node-label">Send Response</span>
                             </div>
-
-                            <!-- Connection lines -->
-                            <svg class="build-connections" viewBox="0 0 100 100" preserveAspectRatio="none">
-                                <path class="build-line" data-line="1" d="M 15 20 L 35 20" stroke="#00D9FF"
-                                    stroke-width="0.5" fill="none" />
-                                <path class="build-line" data-line="2" d="M 45 25 L 30 45" stroke="#00D9FF"
-                                    stroke-width="0.5" fill="none" />
-                                <path class="build-line" data-line="3" d="M 35 50 L 50 50" stroke="#00D9FF"
-                                    stroke-width="0.5" fill="none" />
-                                <path class="build-line" data-line="4" d="M 60 48 L 68 38" stroke="#00D9FF"
-                                    stroke-width="0.5" fill="none" />
-                            </svg>
                         </div>
                     </div>
                 </div>
@@ -551,7 +588,11 @@
                                     <div class="live-message live-msg-out" data-live-msg="2">
                                         <div class="live-bubble">
                                             <div class="live-ai-tag">AI</div>
-                                            Your order is out for delivery! ETA: 2:30 PM ✅
+                                            Your order is out for delivery! ETA: 2:30 PM
+                                            <svg class="check-icon" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg>
                                         </div>
                                     </div>
                                     <div class="live-message live-msg-in" data-live-msg="3">
@@ -560,7 +601,13 @@
                                     <div class="live-message live-msg-out" data-live-msg="4">
                                         <div class="live-bubble">
                                             <div class="live-ai-tag">AI</div>
-                                            30-day money-back guarantee. No questions asked! 💯
+                                            30-day money-back guarantee. No questions asked!
+                                            <svg class="star-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2">
+                                                <polygon
+                                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                                                </polygon>
+                                            </svg>
                                         </div>
                                     </div>
                                 </div>
@@ -580,19 +627,32 @@
             <!-- Tab Navigation -->
             <div class="feature-tabs">
                 <button class="feature-tab active" data-tab="intelligent">
-                    <span class="tab-icon">🧠</span>
+                    <span class="tab-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" />
+                            <path d="M12 8v2" />
+                            <path d="M4 10h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10z" />
+                            <path d="M9 14h6" />
+                        </svg>
+                    </span>
                     <span class="tab-label">Intelligent Responses</span>
                 </button>
                 <button class="feature-tab" data-tab="workflow">
-                    <span class="tab-icon">⚡</span>
+                    <span class="tab-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                        </svg>
+                    </span>
                     <span class="tab-label">Workflow Builder</span>
                 </button>
-                <button class="feature-tab" data-tab="usecases">
-                    <span class="tab-icon">🎯</span>
-                    <span class="tab-label">Multi-use Cases</span>
-                </button>
                 <button class="feature-tab" data-tab="monitoring">
-                    <span class="tab-icon">📊</span>
+                    <span class="tab-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10" />
+                            <line x1="12" y1="20" x2="12" y2="4" />
+                            <line x1="6" y1="20" x2="6" y2="14" />
+                        </svg>
+                    </span>
                     <span class="tab-label">Real-time Monitoring</span>
                 </button>
             </div>
@@ -650,7 +710,13 @@
                                 </div>
                             </div>
                             <div class="intent-result">
-                                <div class="result-icon">🎯</div>
+                                <div class="result-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <circle cx="12" cy="12" r="6"></circle>
+                                        <circle cx="12" cy="12" r="2"></circle>
+                                    </svg>
+                                </div>
                                 <div class="result-text">
                                     <div class="result-label">Detected Intent</div>
                                     <div class="result-value">ORDER_TRACKING</div>
@@ -696,19 +762,45 @@
                         <div class="workflow-demo">
                             <div class="workflow-canvas-demo">
                                 <div class="demo-node" style="top: 20%; left: 15%;">
-                                    <div class="demo-node-icon">📧</div>
+                                    <div class="demo-node-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path
+                                                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
+                                            </path>
+                                            <polyline points="22,6 12,13 2,6"></polyline>
+                                        </svg>
+                                    </div>
                                     <span>Email</span>
                                 </div>
                                 <div class="demo-node" style="top: 50%; left: 40%;">
-                                    <div class="demo-node-icon">🤖</div>
+                                    <div class="demo-node-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                                            <circle cx="12" cy="5" r="2"></circle>
+                                            <path d="M12 7v4"></path>
+                                            <line x1="8" y1="16" x2="8" y2="16"></line>
+                                            <line x1="16" y1="16" x2="16" y2="16"></line>
+                                        </svg>
+                                    </div>
                                     <span>AI Process</span>
                                 </div>
                                 <div class="demo-node" style="top: 20%; left: 65%;">
-                                    <div class="demo-node-icon">💬</div>
+                                    <div class="demo-node-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z">
+                                            </path>
+                                        </svg>
+                                    </div>
                                     <span>WhatsApp</span>
                                 </div>
                                 <div class="demo-node" style="top: 70%; left: 65%;">
-                                    <div class="demo-node-icon">📊</div>
+                                    <div class="demo-node-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="12" y1="20" x2="12" y2="10"></line>
+                                            <line x1="18" y1="20" x2="18" y2="4"></line>
+                                            <line x1="6" y1="20" x2="6" y2="16"></line>
+                                        </svg>
+                                    </div>
                                     <span>Analytics</span>
                                 </div>
                                 <svg class="demo-connections" viewBox="0 0 100 100">
@@ -724,289 +816,64 @@
                     </div>
                 </div>
 
-                <!-- Tab 3: Multi-use Cases -->
-                <div class="feature-content" data-content="usecases">
-                    <div class="feature-text">
-                        <h3 class="feature-title">One agent. Infinite possibilities.</h3>
-                        <p class="feature-description">From e-commerce to healthcare, AgentFlow adapts to any industry
-                            and use case.</p>
-                        <ul class="feature-list">
-                            <li>
-                                <svg viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
-                                </svg>
-                                <span>E-commerce support</span>
-                            </li>
-                            <li>
-                                <svg viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
-                                </svg>
-                                <span>Lead qualification</span>
-                            </li>
-                            <li>
-                                <svg viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
-                                </svg>
-                                <span>Appointment booking</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="feature-demo">
-                        <div class="usecases-demo">
-                            <div class="usecase-card" data-usecase="1">
-                                <div class="usecase-icon">🛍️</div>
-                                <div class="usecase-title">E-commerce</div>
-                                <div class="usecase-stat">1,200+ orders/day</div>
+            </div>
+
+            <!-- Tab 3: Real-time Monitoring -->
+            <div class="feature-content" data-content="monitoring">
+                <div class="feature-text">
+                    <h3 class="feature-title">See everything. Control everything.</h3>
+                    <p class="feature-description">Real-time analytics and monitoring give you complete visibility
+                        into your agent's performance.</p>
+                    <ul class="feature-list">
+                        <li>
+                            <svg viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
+                            </svg>
+                            <span>Live conversation feed</span>
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
+                            </svg>
+                            <span>Performance metrics</span>
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
+                            </svg>
+                            <span>Custom alerts</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="feature-demo">
+                    <div class="monitoring-demo">
+                        <div class="monitor-stats">
+                            <div class="monitor-stat">
+                                <div class="stat-value" data-monitor-value="47">0</div>
+                                <div class="stat-label">Active Chats</div>
                             </div>
-                            <div class="usecase-card" data-usecase="2">
-                                <div class="usecase-icon">🏥</div>
-                                <div class="usecase-title">Healthcare</div>
-                                <div class="usecase-stat">500+ appointments</div>
+                            <div class="monitor-stat">
+                                <div class="stat-value" data-monitor-value="2.3">0</div>
+                                <div class="stat-label">Avg Response (s)</div>
                             </div>
-                            <div class="usecase-card" data-usecase="3">
-                                <div class="usecase-icon">🏦</div>
-                                <div class="usecase-title">Finance</div>
-                                <div class="usecase-stat">2,000+ queries</div>
-                            </div>
-                            <div class="usecase-card" data-usecase="4">
-                                <div class="usecase-icon">🎓</div>
-                                <div class="usecase-title">Education</div>
-                                <div class="usecase-stat">800+ students</div>
+                            <div class="monitor-stat">
+                                <div class="stat-value" data-monitor-value="98">0</div>
+                                <div class="stat-label">Satisfaction %</div>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Tab 4: Real-time Monitoring -->
-                <div class="feature-content" data-content="monitoring">
-                    <div class="feature-text">
-                        <h3 class="feature-title">See everything. Control everything.</h3>
-                        <p class="feature-description">Real-time analytics and monitoring give you complete visibility
-                            into your agent's performance.</p>
-                        <ul class="feature-list">
-                            <li>
-                                <svg viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
-                                </svg>
-                                <span>Live conversation feed</span>
-                            </li>
-                            <li>
-                                <svg viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
-                                </svg>
-                                <span>Performance metrics</span>
-                            </li>
-                            <li>
-                                <svg viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
-                                </svg>
-                                <span>Custom alerts</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="feature-demo">
-                        <div class="monitoring-demo">
-                            <div class="monitor-stats">
-                                <div class="monitor-stat">
-                                    <div class="stat-value" data-monitor-value="47">0</div>
-                                    <div class="stat-label">Active Chats</div>
-                                </div>
-                                <div class="monitor-stat">
-                                    <div class="stat-value" data-monitor-value="2.3">0</div>
-                                    <div class="stat-label">Avg Response (s)</div>
-                                </div>
-                                <div class="monitor-stat">
-                                    <div class="stat-value" data-monitor-value="98">0</div>
-                                    <div class="stat-label">Satisfaction %</div>
-                                </div>
-                            </div>
-                            <div class="monitor-chart">
-                                <canvas id="monitor-chart" width="400" height="200"></canvas>
-                            </div>
+                        <div class="monitor-chart">
+                            <canvas id="monitor-chart" width="400" height="200"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- Use Cases Section -->
-    <section class="usecases-section">
-        <div class="usecases-container">
-            <h2 class="usecases-headline">Built for every industry</h2>
-            <p class="usecases-subheadline">Real businesses. Real results. Real fast.</p>
-
-            <div class="usecases-grid">
-                <!-- Card 1: E-commerce -->
-                <div class="usecase-card-3d">
-                    <div class="card-inner">
-                        <div class="card-front">
-                            <div class="card-icon">🛍️</div>
-                            <h3 class="card-title">E-commerce</h3>
-                            <p class="card-subtitle">Order Tracking & Support</p>
-                            <div class="card-hover-hint">Hover to see results →</div>
-                        </div>
-                        <div class="card-back">
-                            <div class="card-back-label">D2C Fashion Brand</div>
-                            <div class="card-stats">
-                                <div class="stat-change">
-                                    <div class="stat-before">4 hours</div>
-                                    <div class="stat-arrow">→</div>
-                                    <div class="stat-after">2 seconds</div>
-                                </div>
-                                <div class="stat-metric">Response Time</div>
-                            </div>
-                            <div class="card-highlight">
-                                <span class="highlight-number">89%</span>
-                                <span class="highlight-text">queries automated</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 2: Salons & Spas -->
-                <div class="usecase-card-3d">
-                    <div class="card-inner">
-                        <div class="card-front">
-                            <div class="card-icon">💆</div>
-                            <h3 class="card-title">Salons & Spas</h3>
-                            <p class="card-subtitle">Appointment Booking</p>
-                            <div class="card-hover-hint">Hover to see results →</div>
-                        </div>
-                        <div class="card-back">
-                            <div class="card-back-label">Premium Spa Chain</div>
-                            <div class="card-stats">
-                                <div class="stat-change">
-                                    <div class="stat-before">Manual calls</div>
-                                    <div class="stat-arrow">→</div>
-                                    <div class="stat-after">Instant booking</div>
-                                </div>
-                                <div class="stat-metric">Booking Process</div>
-                            </div>
-                            <div class="card-highlight">
-                                <span class="highlight-number">500+</span>
-                                <span class="highlight-text">appointments/month</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 3: Restaurants -->
-                <div class="usecase-card-3d">
-                    <div class="card-inner">
-                        <div class="card-front">
-                            <div class="card-icon">🍽️</div>
-                            <h3 class="card-title">Restaurants</h3>
-                            <p class="card-subtitle">Reservations & Menu</p>
-                            <div class="card-hover-hint">Hover to see results →</div>
-                        </div>
-                        <div class="card-back">
-                            <div class="card-back-label">Fine Dining Restaurant</div>
-                            <div class="card-stats">
-                                <div class="stat-change">
-                                    <div class="stat-before">Phone only</div>
-                                    <div class="stat-arrow">→</div>
-                                    <div class="stat-after">24/7 WhatsApp</div>
-                                </div>
-                                <div class="stat-metric">Availability</div>
-                            </div>
-                            <div class="card-highlight">
-                                <span class="highlight-number">3x</span>
-                                <span class="highlight-text">more reservations</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 4: Healthcare -->
-                <div class="usecase-card-3d">
-                    <div class="card-inner">
-                        <div class="card-front">
-                            <div class="card-icon">🏥</div>
-                            <h3 class="card-title">Healthcare</h3>
-                            <p class="card-subtitle">Patient Support</p>
-                            <div class="card-hover-hint">Hover to see results →</div>
-                        </div>
-                        <div class="card-back">
-                            <div class="card-back-label">Multi-specialty Clinic</div>
-                            <div class="card-stats">
-                                <div class="stat-change">
-                                    <div class="stat-before">2 staff</div>
-                                    <div class="stat-arrow">→</div>
-                                    <div class="stat-after">AI + 1 staff</div>
-                                </div>
-                                <div class="stat-metric">Support Team</div>
-                            </div>
-                            <div class="card-highlight">
-                                <span class="highlight-number">₹50K</span>
-                                <span class="highlight-text">saved monthly</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 5: Real Estate -->
-                <div class="usecase-card-3d">
-                    <div class="card-inner">
-                        <div class="card-front">
-                            <div class="card-icon">🏢</div>
-                            <h3 class="card-title">Real Estate</h3>
-                            <p class="card-subtitle">Lead Qualification</p>
-                            <div class="card-hover-hint">Hover to see results →</div>
-                        </div>
-                        <div class="card-back">
-                            <div class="card-back-label">Property Developer</div>
-                            <div class="card-stats">
-                                <div class="stat-change">
-                                    <div class="stat-before">40% leads</div>
-                                    <div class="stat-arrow">→</div>
-                                    <div class="stat-after">85% leads</div>
-                                </div>
-                                <div class="stat-metric">Qualification Rate</div>
-                            </div>
-                            <div class="card-highlight">
-                                <span class="highlight-number">2.1x</span>
-                                <span class="highlight-text">more conversions</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 6: Agencies -->
-                <div class="usecase-card-3d">
-                    <div class="card-inner">
-                        <div class="card-front">
-                            <div class="card-icon">🎨</div>
-                            <h3 class="card-title">Agencies</h3>
-                            <p class="card-subtitle">Client Onboarding</p>
-                            <div class="card-hover-hint">Hover to see results →</div>
-                        </div>
-                        <div class="card-back">
-                            <div class="card-back-label">Digital Marketing Agency</div>
-                            <div class="card-stats">
-                                <div class="stat-change">
-                                    <div class="stat-before">3 days</div>
-                                    <div class="stat-arrow">→</div>
-                                    <div class="stat-after">30 minutes</div>
-                                </div>
-                                <div class="stat-metric">Onboarding Time</div>
-                            </div>
-                            <div class="card-highlight">
-                                <span class="highlight-number">95%</span>
-                                <span class="highlight-text">client satisfaction</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </section>
+
 
     <!-- Final CTA Section -->
     <section class="final-cta-section">
@@ -1062,6 +929,73 @@
             </div>
         </div>
     </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <img src="logo.png" alt="AutoFlow Logo" class="logo-img">
+                        <span class="logo-text">AutoFlow</span>
+                    </div>
+                    <p class="footer-tagline">Automating the future of business communications.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Product</h4>
+                        <a href="#">Features</a>
+                        <a href="#">Integrations</a>
+                        <a href="#">Enterprise</a>
+                        <a href="#">Pricing</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Company</h4>
+                        <a href="#">About</a>
+                        <a href="#">Blog</a>
+                        <a href="#">Careers</a>
+                        <a href="#">Contact</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Resources</h4>
+                        <a href="#">Documentation</a>
+                        <a href="#">API Reference</a>
+                        <a href="#">Community</a>
+                        <a href="#">Status</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-copyright">
+                    &copy; 2026 AutoFlow Inc. All rights reserved.
+                </div>
+                <div class="footer-social">
+                    <a href="#" aria-label="Twitter">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
+                            </path>
+                        </svg>
+                    </a>
+                    <a href="#" aria-label="GitHub">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+                            </path>
+                        </svg>
+                    </a>
+                    <a href="#" aria-label="LinkedIn">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z">
+                            </path>
+                            <rect x="2" y="9" width="4" height="12"></rect>
+                            <circle cx="4" cy="4" r="2"></circle>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script src="script.js"></script>
 </body>
