@@ -1,4 +1,5 @@
-const sheetsService = require('./sheets.service');
+const googleSheetService = require('./googleSheet.service');
+const sheetsService = googleSheetService; // Alias for backward compatibility with existing code
 
 // Default active workflow (In real app, AI generates this)
 let activeWorkflow = {
@@ -61,8 +62,26 @@ exports.processMessage = async (sock, sender, messageText) => {
         await sock.sendMessage(sender, { text: replyText });
     }
     else if (intent === "place_order") {
-        // Simple buying flow
-        replyText = "🎉 Great choice! To place your order, please reply with your **Full Name and Address**.";
+        // 1. Generate Order ID
+        const orderId = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
+        const totalAmount = "99.00"; // Dummy amount for now
+
+        // 2. Log to Google Sheet
+        console.log("📝 Logging order to Google Sheets:", orderId);
+        const success = await googleSheetService.logOrder({
+            orderId,
+            customer: sender,
+            items: "Unknown Item (Chat Order)",
+            total: totalAmount,
+            status: "Pending"
+        });
+
+        // 3. Reply to User
+        if (success) {
+            replyText = `🎉 Order Placed Successfully!\n\n🆔 **Order ID:** ${orderId}\n📦 Status: Pending\n💰 Total: ₹${totalAmount}\n\nWe will contact you shortly for address confirmation.`;
+        } else {
+            replyText = "⚠️ Sorry, we couldn't place your order right now. Please try again later.";
+        }
         await sock.sendMessage(sender, { text: replyText });
     }
     else if (intent === "product_inquiry") {

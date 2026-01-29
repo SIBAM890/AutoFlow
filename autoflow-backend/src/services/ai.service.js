@@ -9,11 +9,11 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 function validateWorkflow(parsed) {
   // Support both wrappers
   const nodes = parsed.nodes || parsed.steps || parsed.workflow?.nodes;
-  
+
   if (!nodes || !Array.isArray(nodes)) {
     throw new Error("Invalid structure: Missing 'nodes' or 'steps' array");
   }
-  
+
   return nodes;
 }
 
@@ -50,19 +50,33 @@ function generateFallbackWorkflow(reason = "System Busy") {
   };
 }
 
+const googleSheetService = require('./googleSheet.service');
+
 exports.generateWorkflow = async (userPrompt, fileContext = "") => {
   console.log("🤖 AI Service: Generating workflow for:", userPrompt);
-  
-  // Safe extraction of inventory data
-  const inventoryData = fileContext?.preview || fileContext?.data || null;
-  const inventoryColumns = fileContext?.columns || 
-    (inventoryData && inventoryData.length > 0 ? Object.keys(inventoryData[0]) : []);
-    
+
+  // 1. Try to fetch Real Inventory from Google Sheets
+  let inventoryData = null;
+  try {
+    inventoryData = await googleSheetService.syncInventory();
+    console.log(`📊 Loaded ${inventoryData.length} items from Google Sheets`);
+  } catch (e) {
+    console.warn("⚠️ Failed to load Google Sheet inventory, falling back to file context or empty.");
+  }
+
+  // 2. Fallback to file context if Sheet is empty/failed
+  if (!inventoryData || inventoryData.length === 0) {
+    inventoryData = fileContext?.preview || fileContext?.data || null;
+  }
+
+  const inventoryColumns = inventoryData && inventoryData.length > 0 ? Object.keys(inventoryData[0]) : [];
+
+
   // Sample data for AI context
   const sampleData = inventoryData ? inventoryData.slice(0, 3) : [];
-  
+
   if (fileContext) {
-     console.log("📂 With File Context:", inventoryColumns.join(', '));
+    console.log("📂 With File Context:", inventoryColumns.join(', '));
   }
 
   // ⚡ USE FLASH MODEL FOR SPEED (As requested)
@@ -123,15 +137,15 @@ exports.generateWorkflow = async (userPrompt, fileContext = "") => {
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
-      
+
       console.log(`✅ ${modelName} Success. Length:`, text.length);
 
       // Clean JSON
       const cleanJson = text.replace(/```json/g, "").replace(/```/g, "").trim();
       const parsed = JSON.parse(cleanJson);
-      
+
       const nodes = validateWorkflow(parsed);
-      
+
       return { nodes };
 
     } catch (error) {
@@ -147,8 +161,8 @@ exports.generateWorkflow = async (userPrompt, fileContext = "") => {
 exports.explainWorkflow = async (workflowJson) => {
   // ⚡ Simple Text Explanation (Prevents Frontend Crash)
   try {
-      const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
-      const prompt = `
+    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+    const prompt = `
       Analyze this workflow and explain it in simple terms.
       
       Workflow: ${JSON.stringify(workflowJson).substring(0, 2000)}
@@ -158,14 +172,14 @@ exports.explainWorkflow = async (workflowJson) => {
       2. Use bullet points and emojis.
       3. Keep it brief (max 3-4 lines).
       `.trim();
-    
-      const result = await model.generateContent(prompt);
-      const text = result.response.text();
-      // Double cleaning just in case
-      const cleanText = text.replace(/```json/g, "").replace(/```/g, "").replace(/^{"explanation":/g, "").replace(/}$/g, "").trim();
-      
-      return { explanation: cleanText };
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    // Double cleaning just in case
+    const cleanText = text.replace(/```json/g, "").replace(/```/g, "").replace(/^{"explanation":/g, "").replace(/}$/g, "").trim();
+
+    return { explanation: cleanText };
   } catch (e) {
-      return { explanation: "AI could not generate explanation." };
+    return { explanation: "AI could not generate explanation." };
   }
 };
