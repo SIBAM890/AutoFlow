@@ -81,7 +81,7 @@ export const TestMode = () => {
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     className={clsx(
-                                        "max-w-[80%] p-2 rounded-lg text-sm shadow-sm relative pb-5",
+                                        "max-w-[80%] p-2 rounded-lg text-sm shadow-sm relative pb-5 whitespace-pre-wrap",
                                         msg.role === 'user' ? "ml-auto bg-[#D9FDD3] text-black rounded-tr-none" : "mr-auto bg-white text-black rounded-tl-none",
                                         msg.role === 'error' && "bg-red-100 text-red-600"
                                     )}

@@ -169,8 +169,9 @@ exports.explainWorkflow = async (workflowJson) => {
       
       RULES:
       1. Output PLAIN TEXT only. Do NOT output a JSON object.
-      2. Use bullet points and emojis.
-      3. Keep it brief (max 3-4 lines).
+      2. Use a professional, technical tone. Use bullet points.
+      3. Do NOT use emojis.
+      4. Keep it brief (max 3-4 lines).
       `.trim();
 
     const result = await model.generateContent(prompt);

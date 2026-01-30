@@ -26,7 +26,7 @@ exports.processMessage = async (sock, sender, messageText) => {
     // 1. HANDLE GREETINGS (Expanded)
     const greetings = ["hi", "hello", "hy", "hey", "hyy", "hlo", "hola", "start"];
     if (greetings.includes(lowerMsg)) {
-        await sock.sendMessage(sender, { text: "👋 Hi there! I'm AutoFlow AI.\n\nYou can ask:\n- List all products\n- Price of Red Lipstick\n- Track order" });
+        await sock.sendMessage(sender, { text: "👋 Hi there! I'm AutoFlow AI.\n\n- List all products\n- Track order\n-Show me what’s available in your stock" });
         return;
     }
 
@@ -58,7 +58,7 @@ exports.processMessage = async (sock, sender, messageText) => {
     // 3. EXECUTE ACTIONS
     if (intent === "list_products") {
         const productList = await sheetsService.getAllProducts();
-        replyText = `🛍️ *Here is our Product List:*\n\n${productList}\n\nReply with a product name to check stock!`;
+        replyText = `📋 *Here is our Product List:*\n\n${productList}\n\nReply with a product name to check stock!`;
         await sock.sendMessage(sender, { text: replyText });
     }
     else if (intent === "place_order") {
@@ -78,7 +78,7 @@ exports.processMessage = async (sock, sender, messageText) => {
 
         // 3. Reply to User
         if (success) {
-            replyText = `🎉 Order Placed Successfully!\n\n🆔 **Order ID:** ${orderId}\n📦 Status: Pending\n💰 Total: ₹${totalAmount}\n\nWe will contact you shortly for address confirmation.`;
+            replyText = `✅ Order Placed Successfully!\n\n🔹 **Order ID:** ${orderId}\n📦 Status: Pending\n💵 Total: ₹${totalAmount}\n\nWe will contact you shortly for address confirmation.`;
         } else {
             replyText = "⚠️ Sorry, we couldn't place your order right now. Please try again later.";
         }
@@ -88,13 +88,13 @@ exports.processMessage = async (sock, sender, messageText) => {
         const data = await sheetsService.lookupProduct(productQuery);
         if (data.found) {
             if (data.stock > 0) {
-                replyText = `✅ Yes! ${data.product} is available.\n💰 Price: ₹${data.price}\n📦 Stock: ${data.stock} units.\n\nType "Buy now" to order!`;
+                replyText = `✅ Yes! ${data.product} is available.\n💵 Price: ₹${data.price}\n📦 Stock: ${data.stock} units.\n\nType "Buy now" to order!`;
             } else {
                 replyText = `❌ Sorry, ${data.product} is currently out of stock.`;
             }
         } else {
             if (productQuery.length > 1) {
-                replyText = `🤔 I couldn't find "${productQuery}". Try asking "List products" to see what we have.`;
+                replyText = `❓ I couldn't find "${productQuery}". Try asking "List products" to see what we have.`;
             } else {
                 replyText = "Please type the product name.";
             }
@@ -106,6 +106,6 @@ exports.processMessage = async (sock, sender, messageText) => {
     }
     else {
         // Fallback
-        await sock.sendMessage(sender, { text: "🤖 I didn't understand. Try:\n- 'List products'\n- 'Price of Red Lipstick'" });
+        await sock.sendMessage(sender, { text: "🤖 I didn't understand. Try:\n- List products\n- Track order" });
     }
 };

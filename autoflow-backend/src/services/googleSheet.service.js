@@ -84,7 +84,7 @@ exports.logOrder = async (orderData) => {
 
         await sheets.spreadsheets.values.append({
             spreadsheetId: SPREADSHEET_ID,
-            range: 'Orders!A:F',
+            range: 'Order!A:F',
             valueInputOption: 'USER_ENTERED',
             resource: {
                 values: [

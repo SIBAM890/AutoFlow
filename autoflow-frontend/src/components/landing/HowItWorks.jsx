@@ -44,7 +44,7 @@ const HowItWorks = () => {
             }, 30); // Slightly faster typing for better feel
             return () => clearInterval(interval);
         }
-    }, [isStep1Visible, typedText]); // Added typedText to dependency array to prevent re-typing if already typed
+    }, [isStep1Visible]); // Removed typedText to prevent effect cleanup on state change
 
     // Step 3: Counter Animation
     useEffect(() => {
@@ -132,7 +132,7 @@ const HowItWorks = () => {
                                 <div className={`build-node absolute px-5 py-2.5 bg-[#1A1A1A] border border-white/10 rounded-xl text-xs font-medium text-white shadow-xl ${isStep2Visible ? 'animate-[fadeInUp_0.5s_0.6s_both]' : 'opacity-0'}`} data-node="2" style={{ top: '15%', left: '45%' }}><span>Analysis</span></div>
                                 <div className={`build-node absolute px-5 py-2.5 bg-[#1A1A1A] border border-white/10 rounded-xl text-xs font-medium text-white shadow-xl ${isStep2Visible ? 'animate-[fadeInUp_0.5s_1.0s_both]' : 'opacity-0'}`} data-node="5" style={{ top: '35%', left: '75%' }}><span>Send</span></div>
                                 <svg className="build-connections absolute inset-0 pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-                                    <path className="build-line" data-line="1" d="M 15 28.5 L 45 28.5" stroke="#10B981" strokeWidth="0.5" fill="none" strokeDasharray="2" className="animate-[dash_1s_linear_infinite]" />
+                                    <path className="build-line animate-[dash_1s_linear_infinite]" data-line="1" d="M 15 28.5 L 45 28.5" stroke="#10B981" strokeWidth="0.5" fill="none" strokeDasharray="2" />
                                 </svg>
                             </div>
                         </div>

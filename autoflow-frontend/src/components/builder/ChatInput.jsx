@@ -7,16 +7,16 @@ export const ChatInput = ({ onSend, disabled }) => {
     const [text, setText] = useState('');
     const { isListening, transcript, startListening, stopListening, error } = useVoiceInput();
 
-    // Effect to update text when voice transcript changes
+    // Track previous listening state to detect stop
+    const [wasListening, setWasListening] = useState(false);
+
     useEffect(() => {
-        if (transcript) {
-            setText(prev => {
-                // If appending, add space. For now, let's just replace or append smart.
-                // Simple approach: if text exists, append.
-                return prev ? `${prev} ${transcript}` : transcript;
-            });
+        if (wasListening && !isListening && transcript) {
+            // Commit transcript when tracking stops
+            setText(prev => (prev ? `${prev} ${transcript}` : transcript));
         }
-    }, [transcript]);
+        setWasListening(isListening);
+    }, [isListening, transcript, wasListening]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -54,11 +54,11 @@ export const ChatInput = ({ onSend, disabled }) => {
 
                 <input
                     type="text"
-                    value={text}
+                    value={isListening ? (text + (text && transcript ? ' ' : '') + transcript) : text}
                     onChange={(e) => setText(e.target.value)}
                     placeholder={isListening ? "Listening..." : "Describe your workflow..."}
                     className="flex-1 bg-transparent border-none focus:ring-0 text-gray-900 placeholder-gray-400"
-                    disabled={disabled}
+                    disabled={disabled || isListening} // Disable typing while listening to avoid conflicts
                 />
 
                 <button

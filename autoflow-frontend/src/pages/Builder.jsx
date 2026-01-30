@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ReactFlowProvider } from 'reactflow';
 import { ChatInterface } from '../components/builder/ChatInterface';
 import { WorkflowGraph } from '../components/visualization/WorkflowGraph';
@@ -25,11 +26,11 @@ const Builder = () => {
         setWorkflow(data);
     };
 
+    const navigate = useNavigate();
+
     const handleDeploy = () => {
-        setBusinessName(tempName || "My Automation");
-        setIsDeployed(true);
-        setIsDeployOpen(false);
-        setIsCustomMode(false);
+        // Navigate to the full deployment page
+        navigate('/deploy-agent');
     };
 
     return (
@@ -83,7 +84,7 @@ const Builder = () => {
                             </button>
 
                             <button
-                                onClick={() => setIsDeployOpen(true)}
+                                onClick={handleDeploy}
                                 className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm font-medium animate-pulse"
                             >
                                 <Rocket size={16} />

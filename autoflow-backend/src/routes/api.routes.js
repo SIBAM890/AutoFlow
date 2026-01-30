@@ -2,7 +2,13 @@ const express = require('express');
 const router = express.Router();
 const workflowController = require('../controllers/workflow.controller');
 const uploadController = require('../controllers/upload.controller');
+const whatsappController = require('../controllers/whatsapp.controller'); // New Controller
 const engineService = require('../services/engine.service');
+
+// WhatsApp Deployment Routes
+router.post('/whatsapp/deploy', whatsappController.deployAgent);
+router.get('/whatsapp/status', whatsappController.getStatus);
+router.post('/whatsapp/logout', whatsappController.logoutAgent);
 
 // AI Routes
 router.post('/generate-workflow', workflowController.createWorkflow);
