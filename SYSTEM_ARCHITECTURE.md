@@ -1,7 +1,3 @@
-## AutoFlow System Architecture
-
-### System Architecture Diagram
-
 ```mermaid
 graph TD
     User([Customer (WhatsApp)])
