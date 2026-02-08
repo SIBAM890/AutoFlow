@@ -1,17 +1,5 @@
 # AutoFlow System Architecture
 
-## 1. High-Level Overview
-
-AutoFlow is a hybrid **Pro-Code/No-Code** platform acting as a bridge between **WhatsApp Users** and **Business Logic**. It allows users to visually build (or AI-generate) conversational agents that are deployed to real WhatsApp numbers.
-
-The system uses a **decoupled architecture**:
-- **Frontend**: A React-based SPA for the dashboard, builder, and deployment management.
-- **Backend**: A Node.js/Express server handling real-time WhatsApp connections (Baileys), AI processing (Gemini), and data persistence (Google Sheets).
-
----
-
-## 2. System Architecture Diagram
-
 ```mermaid
 graph TD
     User([Customer (WhatsApp)])
@@ -87,6 +75,7 @@ graph TD
     Svc_Sheets -->|REST API| Google_Sheets
     Svc_AI -->|REST API| Google_AI
 ```
+
 
 
 ## 3. Component Breakdown
