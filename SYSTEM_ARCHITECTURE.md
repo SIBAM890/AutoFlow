@@ -14,6 +14,7 @@ The system uses a **decoupled architecture**:
 
 ```mermaid
 graph TD
+    %% Entities
     User([Customer (WhatsApp)])
     WebVisitor([Website Visitor])
     Admin([Admin / Business Owner])
@@ -58,8 +59,7 @@ graph TD
         Session_Store[Local Session Store]
     end
 
-    %% CONNECTIONS
-    
+    %% CONNECTIONS    
     User -->|E2E Encrypted| WA_Servers
     WebVisitor -->|Visits| Landing_Page
     Landing_Page --> Navbar
@@ -89,10 +89,9 @@ graph TD
     Svc_Engine -->|Read/Write| Svc_Sheets
     Svc_Engine -.->|AI Logic| Svc_AI
     
-    Svc_Sheets -->|REST| Google_Sheets
-    Svc_AI -->|REST| Google_AI
+    Svc_Sheets -->|REST API| Google_Sheets
+    Svc_AI -->|REST API| Google_AI
 ```
-
 ---
 
 ## 3. Component Breakdown
