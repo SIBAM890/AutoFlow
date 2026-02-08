@@ -14,7 +14,6 @@ The system uses a **decoupled architecture**:
 
 ```mermaid
 graph TD
-    %% Entities
     User([Customer (WhatsApp)])
     WebVisitor([Website Visitor])
     Admin([Admin / Business Owner])
@@ -22,7 +21,6 @@ graph TD
     Google_AI[Google Gemini AI]
     Google_Sheets[Google Sheets (DB)]
 
-    %% FRONTEND
     subgraph Frontend_React_Vite["Frontend (React + Vite)"]
         direction TB
         subgraph Public_Facing["Public Facing"]
@@ -40,7 +38,6 @@ graph TD
         end
     end
 
-    %% BACKEND
     subgraph Backend_Node_Express["Backend (Node.js + Express)"]
         API[API Routes (/api)]
         
@@ -59,7 +56,6 @@ graph TD
         Session_Store[Local Session Store]
     end
 
-    %% CONNECTIONS    
     User -->|E2E Encrypted| WA_Servers
     WebVisitor -->|Visits| Landing_Page
     Landing_Page --> Navbar
@@ -70,7 +66,6 @@ graph TD
     Admin -->|HTTP / WebSocket| UI_Dashboard
     Admin -->|Interacts| UI_Builder
 
-    %% Frontend <-> Backend
     UI_Deploy -->|POST /whatsapp/deploy| API
     UI_Sim -->|POST /simulate-message| API
     UI_Builder -->|POST /generate-workflow| API
@@ -92,7 +87,7 @@ graph TD
     Svc_Sheets -->|REST API| Google_Sheets
     Svc_AI -->|REST API| Google_AI
 ```
----
+
 
 ## 3. Component Breakdown
 
