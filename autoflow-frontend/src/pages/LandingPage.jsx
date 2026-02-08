@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/landing.css';
+// Tailwind styles are used instead of custom CSS
 import Navbar from '../components/landing/Navbar';
 import Hero from '../components/landing/Hero';
 import Comparison from '../components/landing/Comparison';
@@ -11,7 +11,7 @@ import Footer from '../components/landing/Footer';
 const LandingPage = () => {
     return (
         // We add 'text-white' and 'font-sans' here to force the elegant look
-        <div className="landing-page relative w-full overflow-hidden text-white font-sans selection:bg-emerald-500/30">
+        <div className="min-h-screen bg-dark-900 text-white font-sans selection:bg-primary/30 relative w-full overflow-hidden">
 
             {/* --- BACKGROUND EFFECTS --- */}
 
@@ -19,7 +19,7 @@ const LandingPage = () => {
             <div className="fixed top-0 left-0 w-full h-full bg-[#050505] -z-50"></div>
 
             {/* 2. Top-Center Spotlight (Creates the "Stage" effect) */}
-            <div className="fixed top-[-20%] left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-emerald-900/20 blur-[120px] rounded-full pointer-events-none -z-40"></div>
+            <div className="fixed top-[-20%] left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-primary/10 blur-[120px] rounded-full pointer-events-none -z-40"></div>
 
             {/* 3. Subtle Noise Texture (Adds the "expensive" grainy feel) */}
             <div className="fixed top-0 left-0 w-full h-full opacity-[0.04] pointer-events-none z-0 mix-blend-overlay"

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Send, CheckCircle, Clock } from 'lucide-react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
@@ -17,26 +17,26 @@ export default function DeployPage() {
         deployAgent();
     }, []);
 
+    // Use a ref to track if component is mounted to prevent state updates on unmount
+    const isMounted = useRef(true);
+    const isConnectedRef = useRef(isConnected);
+
     useEffect(() => {
-        let interval;
-        if (!isConnected) {
-            interval = setInterval(checkStatus, 2000);
-        }
-        return () => clearInterval(interval);
+        return () => { isMounted.current = false; };
+    }, []);
+
+    useEffect(() => {
+        isConnectedRef.current = isConnected;
     }, [isConnected]);
 
-    const deployAgent = async () => {
-        try {
-            await fetch('http://localhost:3000/api/whatsapp/deploy', { method: 'POST' });
-        } catch (err) {
-            console.error("Deploy failed", err);
-        }
-    };
-
-    const checkStatus = async () => {
+    const checkStatus = useCallback(async () => {
         try {
             const response = await fetch('http://localhost:3000/api/whatsapp/status');
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
             const data = await response.json();
+
+            if (!isMounted.current) return; // Prevent updates if unmounted
 
             if (data.success) {
                 if (data.connected) {
@@ -44,29 +44,54 @@ export default function DeployPage() {
                     setQrCode(null);
                     setIsDeploying(false);
                     setStatusText("Agent Active & Listening");
-                    if (messages.length === 0) {
-                        setMessages([{
-                            role: 'bot',
-                            text: "👋 Agent Deployed! I'm now live and responding to messages on this number.",
-                            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                        }]);
-                    }
+
+                    setMessages(prev => {
+                        if (prev.length === 0) {
+                            return [{
+                                role: 'bot',
+                                text: "👋 Agent Deployed! I'm now live and responding to messages on this number.",
+                                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                            }];
+                        }
+                        return prev;
+                    });
                 } else if (data.qr) {
+                    // Start polling
                     setQrCode(data.qr);
                     setIsDeploying(false);
                     setStatusText("Scan QR Code to Connect");
                 } else if (!data.connecting && !data.connected && !data.qr) {
-                    // Backend is idle/stopped. If we are expecting headers, something failed.
-                    // But wait, initially it might be idle.
-                    // Let's assume if this persists, we should offer a manual start.
                     setIsDeploying(false);
                     setStatusText("Agent Stopped. Click 'Reset Connection' to restart.");
                 }
             }
         } catch (err) {
-            console.error("Status check failed", err);
+            if (!isMounted.current) return;
+            // Quietly fail or update status text indicating backend issue
+            console.warn("Status check failed (Backend likely offline):", err.message);
+            setStatusText("Connecting to server...");
         }
-    };
+    }, []); // No dependencies needed as we use functional state updates
+
+    useEffect(() => {
+        let timeoutId;
+
+        const poll = async () => {
+            // Check the *live* ref value, not the stale closure 'isConnected'
+            if (isConnectedRef.current) return;
+
+            await checkStatus();
+
+            // Check again after async operation before scheduling next poll
+            if (!isConnectedRef.current && isMounted.current) {
+                timeoutId = setTimeout(poll, 2000);
+            }
+        };
+
+        poll();
+
+        return () => clearTimeout(timeoutId);
+    }, [checkStatus]); // Run once on mount (since checkStatus is stable), relies on ref for state checks
 
     const handleLogout = async () => {
         if (!confirm("Are you sure? This will disconnect the current WhatsApp session.")) return;
