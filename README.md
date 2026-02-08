@@ -1,7 +1,7 @@
-# 🌊 AutoFlow: Autonomous WhatsApp Agent Builder
+# 🌊 AutoFlow: Autonomous Agent Builder
 
 **Build. Visualize. Deploy.**  
-The professional platform for building AI-driven WhatsApp agents with visual workflows and real-time inventory sync.
+The professional platform for building AI-driven agents with visual workflows and real-time inventory sync.
 
 ![Frontend](https://img.shields.io/badge/Frontend-React%2018-61DAFB?logo=react&logoColor=white&style=flat-square)
 ![Backend](https://img.shields.io/badge/Backend-Node.js-339933?logo=nodedotjs&logoColor=white&style=flat-square)
@@ -13,7 +13,7 @@ The professional platform for building AI-driven WhatsApp agents with visual wor
 
 ## 💡 Overview
 
-**AutoFlow** is a comprehensive solution for businesses looking to automate customer interaction on WhatsApp. Unlike simple chatbots, AutoFlow agents are:
+**AutoFlow** is a comprehensive solution for businesses looking to automate customer interaction on WhatsApp/Facebook/Instagram. Unlike simple chatbots, AutoFlow agents are:
 
 *   **Context-Aware**: They remember conversation history.
 *   **Data-Connected**: They read/write to your Google Sheets inventory in real-time.
