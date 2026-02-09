@@ -53,14 +53,14 @@ AutoFlow employs a **Microservices-inspired architecture**. The frontend communi
 
 ```mermaid
 graph TD
-    User([Customer (WhatsApp)])
+    User([Customer - WhatsApp])
     WebVisitor([Website Visitor])
-    Admin([Admin / Business Owner])
+    Admin([Admin - Business Owner])
     WA_Servers[WhatsApp Servers]
     Google_AI[Google Gemini AI]
-    Google_Sheets[Google Sheets (DB)]
+    Google_Sheets[Google Sheets DB]
 
-    subgraph Frontend_React_Vite["Frontend (React + Vite)"]
+    subgraph Frontend_React_Vite["Frontend - React + Vite"]
         direction TB
         subgraph Public_Facing["Public Facing"]
             Landing_Page[Landing Page]
@@ -70,15 +70,15 @@ graph TD
         
         subgraph App_Dashboard["App / Dashboard"]
             UI_Auth[Auth / Login]
-            UI_Builder[Logic Builder (ReactFlow)]
+            UI_Builder[Logic Builder - ReactFlow]
             UI_Deploy[Deployment Manager]
             UI_Dashboard[ROI Dashboard]
             UI_Sim[Simulator]
         end
     end
 
-    subgraph Backend_Node_Express["Backend (Node.js + Express)"]
-        API[API Routes (/api)]
+    subgraph Backend_Node_Express["Backend - Node.js + Express"]
+        API[API Routes - /api]
         
         subgraph Controllers["Controllers"]
             Ctrl_WA[WhatsApp Controller]
@@ -86,7 +86,7 @@ graph TD
         end
         
         subgraph Core_Services["Core Services"]
-            Svc_WA[WhatsApp Service (Baileys)]
+            Svc_WA[WhatsApp Service - Baileys]
             Svc_Engine[Logic Engine]
             Svc_AI[AI Service]
             Svc_Sheets[Google Sheet Service]
@@ -145,7 +145,79 @@ graph TD
 
 ---
 
-## 🚀 Quick Start
+## � Message Processing Workflow
+
+```mermaid
+graph TD
+    %% STYLES
+    classDef user fill:#E5F4FD,stroke:#3B82F6,stroke-width:2px,color:#1e3a8a;
+    classDef whatsapp fill:#DCFCE7,stroke:#22C55E,stroke-width:2px,color:#14532d;
+    classDef engine fill:#F3E8FF,stroke:#A855F7,stroke-width:2px,color:#581c87;
+    classDef sheets fill:#FEF3C7,stroke:#F59E0B,stroke-width:2px,color:#78350f;
+    classDef ai fill:#FCE7F3,stroke:#EC4899,stroke-width:2px,color:#831843;
+
+    %% EXTERNAL
+    User((👤 User Phone)):::user
+    WAServer[☁️ WhatsApp Cloud]:::whatsapp
+
+    %% BACKEND CONTEXT
+    subgraph Processing_System ["⚡ AutoFlow Processing System"]
+        direction TB
+        
+        Baileys[🔌 Baileys Socket Service]:::whatsapp
+        
+        subgraph Engine_Core ["⚙️ Logic Engine Core"]
+            Decrypt[🔓 Decrypt & Parse]:::engine
+            PreProcess[🧹 Sanitize & Normalization]:::engine
+            Router{🚦 Intent Router}:::engine
+        end
+
+        subgraph Handlers ["🛠️ Action Handlers"]
+            H_Static[📝 Static Response]:::engine
+            H_Sheet[📊 Sheet Service]:::sheets
+            H_AI[🧠 AI Service]:::ai
+        end
+
+        ResponseBuilder[✉️ Response Formatter]:::engine
+    end
+
+    %% EXTERNAL DATA
+    GSheets[(Google Sheets DB)]:::sheets
+    GeminiAPI[✨ Gemini Pro API]:::ai
+
+    %% CONNECTIONS & LOGIC FLOW
+    User -->|1. Sends Msg| WAServer
+    WAServer -->|2. WebSocket Push| Baileys
+    Baileys -->|3. Event: messages.upsert| Decrypt
+    Decrypt -->|4. Clean Text| PreProcess
+    PreProcess -->|5. Analyzed Text| Router
+
+    %% ROUTING LOGIC
+    Router -->|'Hi', 'Menu'| H_Static
+    Router -->|'Price', 'Stock'| H_Sheet
+    Router -->|'Order', 'Buy'| H_Sheet
+    Router -->|Unmatched/Complex| H_AI
+
+    %% HANDLER EXECUTION
+    H_Static -->|Get Template| ResponseBuilder
+    
+    H_Sheet -->|6a. Read/Write| GSheets
+    GSheets -->|6b. Data Return| H_Sheet
+    H_Sheet -->|Format Data| ResponseBuilder
+
+    H_AI -->|7a. Prompt + Context| GeminiAPI
+    GeminiAPI -->|7b. Generated Text| H_AI
+    H_AI -->|Natural Response| ResponseBuilder
+
+    %% FINAL REPLY
+    ResponseBuilder -->|8. Final Payload| Baileys
+    Baileys -->|9. Send Message| WAServer
+    WAServer -->|10. Delivers| User
+```
+
+---
+
+## �🚀 Quick Start
 
 ### 1️⃣ Prerequisites
 *   **Node.js** v18 or higher
