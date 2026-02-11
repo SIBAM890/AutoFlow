@@ -21,8 +21,8 @@ const Footer = () => {
                     <div className="flex gap-16">
                         <div className="flex flex-col gap-4">
                             <h4 className="font-bold text-white mb-2">Product</h4>
-                            <a href="#" className="text-sm text-gray-400 hover:text-primary transition-colors">Features</a>
-                            <a href="#" className="text-sm text-gray-400 hover:text-primary transition-colors">Pricing</a>
+                            <a href="#features" className="text-sm text-gray-400 hover:text-primary transition-colors">Features</a>
+                            <a href="#comparison" className="text-sm text-gray-400 hover:text-primary transition-colors">Pricing</a>
                             <a href="#" className="text-sm text-gray-400 hover:text-primary transition-colors">Integrations</a>
                         </div>
                         <div className="flex flex-col gap-4">
@@ -35,7 +35,7 @@ const Footer = () => {
                 </div>
                 <div className="border-t border-white/5 pt-8 text-center">
                     <p className="text-gray-600 text-xs">
-                        &copy; 2026 AutoFlow Inc. All rights reserved. Built with ❤️ for the future.
+                        &copy; 2026 AutoFlow Inc. All rights reserved. Built for the future.
                     </p>
                 </div>
             </div>

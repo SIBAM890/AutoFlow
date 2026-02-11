@@ -70,8 +70,6 @@ exports.generateWorkflow = async (userPrompt, fileContext = "") => {
   }
 
   const inventoryColumns = inventoryData && inventoryData.length > 0 ? Object.keys(inventoryData[0]) : [];
-
-
   // Sample data for AI context
   const sampleData = inventoryData ? inventoryData.slice(0, 3) : [];
 
@@ -80,8 +78,7 @@ exports.generateWorkflow = async (userPrompt, fileContext = "") => {
   }
 
   // ⚡ USE FLASH MODEL FOR SPEED (As requested)
-  // Fallback to pro if flash fails
-  const modelsToTry = ["gemini-flash-latest", "gemini-1.5-flash", "gemini-pro"];
+  const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-flash-latest", "gemini-pro-latest"];
 
   for (const modelName of modelsToTry) {
     try {
@@ -89,49 +86,66 @@ exports.generateWorkflow = async (userPrompt, fileContext = "") => {
       const model = genAI.getGenerativeModel({ model: modelName });
 
       const prompt = `
-      Act as an Automation Architect. 
-      Generate a JSON workflow for: "${userPrompt}"
-      
-      CONTEXT:
+      You are an **Elite Conversation Designer** for WhatsApp Automation.
+      Your goal is to build a high-conversion, empathetic, and logical workflow based on the user's request: "${userPrompt}"
+
+      ### 📊 AVAILABLE DATA CONTEXT:
       ${sampleData.length > 0 ? `
-      - INVENTORY COLUMNS: ${inventoryColumns.join(', ')}
-      - SAMPLE DATA: ${JSON.stringify(sampleData)}
-      (Use 'condition' nodes to check Stock/Price if relevant)
-      ` : ''}
-      
-      RULES:
-      1. Create a LOGICAL FLOW (Step 1 -> Step 2 -> Step 3).
-      2. Every node MUST detect its target using:
-         - "next": ["target_id"] (For standard actions)
-         - "true_id": "target_id", "false_id": "target_id" (For conditions)
-         - "outputs": { "intent": "target_id" } (For AI Agents)
-      3. Do NOT connect everything to the Start node. Chain them!
-      
-      STRICT OUTPUT format (JSON ONLY):
+      - **Linked Database**: Google Sheet
+      - **Columns**: [${inventoryColumns.join(', ')}]
+      - **Sample Data**: ${JSON.stringify(sampleData[0])}
+      - *Tip*: You can create 'condition' nodes to check values (e.g., if 'Stock' > 0, if 'Price' < 1000).
+      ` : '- No external data connected yet. Build a generic flow.'}
+
+      ### 🎨 DESIGN RULES:
+      1. **Start Strong**: Always begin with a 'trigger' node (label: "Incoming Message").
+      2. **Smart Routing**: 
+         - If the request implies choices (e.g., "sales vs support"), use an 'ai_agent' or 'router' node.
+         - If the request implies data checking (e.g., "check stock"), use a 'condition' node.
+      3. **Natural Flow**: 
+         - Don't just dump info. Break long messages into multiple 'action' nodes.
+         - Use emojis (ℹ️, 📦, ✅) to make it friendly and professional.
+      4. **Structure**:
+         - Linear: A -> B -> C
+         - Branching: A -> (Condition) -> True: B / False: C
+
+      ### 🛑 STRICT JSON OUTPUT FORMAT:
+      Return **ONLY** valid JSON. No markdown backticks.
       {
         "nodes": [
            { 
              "id": "1", 
              "type": "trigger", 
+             "position": { "x": 50, "y": 250 },
              "data": { "label": "Start" },
              "next": ["2"] 
            },
            {
              "id": "2",
              "type": "ai_agent", 
-             "data": { "label": "Detect Intent", "outputs": { "price": "3", "stock": "4" } }
+             "position": { "x": 300, "y": 250 },
+             "data": { 
+                "label": "Analyze Intent",
+                "systemPrompt": "Classify user intent: buy OR support",
+                "outputs": { "buy": "3", "support": "4" } 
+             }
            },
            {
              "id": "3", 
              "type": "action", 
-             "data": { "label": "Check Price" },
-             "next": ["5"]
+             "position": { "x": 600, "y": 100 },
+             "data": { "label": "Show Products", "actionType": "send_message", "payload": "Here are our latest items... 🛍️" },
+             "next": []
+           },
+           {
+             "id": "4", 
+             "type": "action", 
+             "position": { "x": 600, "y": 400 },
+             "data": { "label": "Contact Support", "actionType": "send_message", "payload": "Connecting you to an agent... 📞" },
+             "next": []
            }
-           // ... more nodes
         ]
       }
-      
-      Generate now.
       `.trim();
 
       const result = await model.generateContent(prompt);

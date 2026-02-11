@@ -7,7 +7,7 @@ import { Paperclip, FileText, X } from 'lucide-react'; // Import Icons
 
 export const ChatInterface = ({ onWorkflowGenerated }) => {
     const [messages, setMessages] = useState([
-        { role: 'ai', content: "👋 Hi! I'm AutoFlow. Upload your inventory file (Excel/CSV) for better accuracy, or just describe what you need!" }
+        { role: 'ai', content: "🤖 Hi! I'm AutoFlow. Upload your inventory file (Excel/CSV) for better accuracy, or just describe what you need!" }
     ]);
     const [isLoading, setIsLoading] = useState(false);
     const [uploadedFile, setUploadedFile] = useState(null); // { name, context }

@@ -26,7 +26,7 @@ exports.processMessage = async (sock, sender, messageText) => {
     // 1. HANDLE GREETINGS (Expanded)
     const greetings = ["hi", "hello", "hy", "hey", "hyy", "hlo", "hola", "start"];
     if (greetings.includes(lowerMsg)) {
-        await sock.sendMessage(sender, { text: "👋 Hi there! I'm AutoFlow AI.\n\n- List all products\n- Track order\n-Show me what’s available in your stock" });
+        await sock.sendMessage(sender, { text: "🤖 AutoFlow AI System\n\n- List all products\n- Track order\n- Show me what’s available in your stock" });
         return;
     }
 

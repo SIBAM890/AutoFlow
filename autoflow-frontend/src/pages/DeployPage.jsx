@@ -3,8 +3,10 @@ import { Send, CheckCircle, Clock } from 'lucide-react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
+import { useNavigate } from 'react-router-dom';
 
 export default function DeployPage() {
+    const navigate = useNavigate();
     const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState("");
     const [qrCode, setQrCode] = useState(null);
@@ -12,12 +14,26 @@ export default function DeployPage() {
     const [isDeploying, setIsDeploying] = useState(true);
     const [statusText, setStatusText] = useState("Initializing Agent...");
 
+    const deployAgent = async () => {
+        setIsDeploying(true);
+        setStatusText("Initializing Agent...");
+        try {
+            const response = await fetch('http://localhost:3000/api/whatsapp/deploy', { method: 'POST' });
+            if (!response.ok) throw new Error('Deployment failed');
+            // The polling (checkStatus) will handle the rest
+        } catch (err) {
+            console.error("Deployment failed", err);
+            setStatusText("Deployment failed. Please try again.");
+            setIsDeploying(false);
+        }
+    };
+
     useEffect(() => {
         // Start deployment immediately
         deployAgent();
     }, []);
 
-    // Use a ref to track if component is mounted to prevent state updates on unmount
+    // Use a ref to track if component is mounted
     const isMounted = useRef(true);
     const isConnectedRef = useRef(isConnected);
 
@@ -36,7 +52,7 @@ export default function DeployPage() {
 
             const data = await response.json();
 
-            if (!isMounted.current) return; // Prevent updates if unmounted
+            if (!isMounted.current) return;
 
             if (data.success) {
                 if (data.connected) {
@@ -49,14 +65,13 @@ export default function DeployPage() {
                         if (prev.length === 0) {
                             return [{
                                 role: 'bot',
-                                text: "👋 Agent Deployed! I'm now live and responding to messages on this number.",
+                                text: "🚀 Agent Deployed! I'm now live and responding to messages on this number.",
                                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                             }];
                         }
                         return prev;
                     });
                 } else if (data.qr) {
-                    // Start polling
                     setQrCode(data.qr);
                     setIsDeploying(false);
                     setStatusText("Scan QR Code to Connect");
@@ -67,49 +82,47 @@ export default function DeployPage() {
             }
         } catch (err) {
             if (!isMounted.current) return;
-            // Quietly fail or update status text indicating backend issue
-            console.warn("Status check failed (Backend likely offline):", err.message);
+            console.warn("Status check failed", err.message);
             setStatusText("Connecting to server...");
         }
-    }, []); // No dependencies needed as we use functional state updates
+    }, []);
 
     useEffect(() => {
         let timeoutId;
-
         const poll = async () => {
-            // Check the *live* ref value, not the stale closure 'isConnected'
             if (isConnectedRef.current) return;
-
             await checkStatus();
-
-            // Check again after async operation before scheduling next poll
             if (!isConnectedRef.current && isMounted.current) {
                 timeoutId = setTimeout(poll, 2000);
             }
         };
-
         poll();
-
         return () => clearTimeout(timeoutId);
-    }, [checkStatus]); // Run once on mount (since checkStatus is stable), relies on ref for state checks
+    }, [checkStatus]);
 
     const handleLogout = async () => {
         if (!confirm("Are you sure? This will disconnect the current WhatsApp session.")) return;
-
         try {
             await fetch('http://localhost:3000/api/whatsapp/logout', { method: 'POST' });
             setIsConnected(false);
             setQrCode(null);
             setIsDeploying(true);
             setMessages([]);
-            deployAgent(); // Restart deployment to get new QR
+            deployAgent();
         } catch (err) {
             console.error("Logout failed", err);
         }
     };
 
     return (
-        <div className="flex h-screen bg-gray-50">
+        <div className="flex h-screen bg-gray-50 relative">
+            {/* Back to Builder Button */}
+            <button
+                onClick={() => navigate('/builder')}
+                className="absolute top-6 left-6 z-50 flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-sm border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all font-medium"
+            >
+                ← Back to Builder
+            </button>
             {/* Phone Simulator - Left Side */}
             <div className="w-1/2 p-8 flex flex-col items-center justify-center bg-gray-100 border-r border-gray-200">
                 <div className="mb-6 text-center">
