@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from sqlmodel import Session, select
 import asyncio
 
-from database import create_db_and_tables, get_session
+from database import create_db_and_tables, get_session, engine
 import models
 from schemas import WorkflowGenerateRequest, WorkflowSchema
 from ollama_client import generate_workflow, explain_workflow
@@ -19,7 +19,7 @@ from routers.audit import router as audit_router
 async def lifespan(app: FastAPI):
     create_db_and_tables()
     # Seed DB with initial data
-    with Session(database.engine) as session:
+    with Session(engine) as session:
         seed_database(session)
     yield
 
