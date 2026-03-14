@@ -16,11 +16,9 @@ const AUTH_DIR = '/app/.wwebjs_auth';
 
 // Cleanup stale Chromium locks from previous dirty exits
 try {
-    const lockPath = path.join(AUTH_DIR, 'session', 'SingletonLock');
-    if (fs.existsSync(lockPath)) {
-        fs.unlinkSync(lockPath);
-        console.log('Removed stale Chromium SingletonLock');
-    }
+    const { execSync } = require('child_process');
+    execSync(`find ${AUTH_DIR} -name "Singleton*" -delete 2>/dev/null || true`);
+    console.log('Removed stale Chromium SingletonLocks');
 } catch (e) {
     console.error('Lock cleanup failed:', e.message);
 }
