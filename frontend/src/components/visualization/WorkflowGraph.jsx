@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useWorkflowStore } from '../../store/workflowStore';
 import ReactFlow, {
     Controls,
     Background,
@@ -10,6 +11,12 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { CustomNode } from './CustomNode';
+import TriggerNode from '../nodes/TriggerNode';
+import ActionNode from '../nodes/ActionNode';
+import ConditionNode from '../nodes/ConditionNode';
+import WhatsAppNode from '../nodes/WhatsAppNode';
+import InventoryNode from '../nodes/InventoryNode';
+import DelayNode from '../nodes/DelayNode';
 
 // Simple ID generator
 const generateId = () => `node_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -79,13 +86,20 @@ const getLayoutedElements = (nodes, edges) => {
 };
 
 export const WorkflowGraph = ({ workflowData }) => {
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+    const { nodes, edges, setNodes, setEdges, onNodesChange, onEdgesChange, setSelectedNode } = useWorkflowStore();
     const reactFlowInstance = useReactFlow();
     const reactFlowWrapper = useRef(null);
 
     // Register custom node types
-    const nodeTypes = useMemo(() => ({ custom: CustomNode }), []);
+    const nodeTypes = useMemo(() => ({ 
+        trigger: TriggerNode,
+        action: ActionNode,
+        condition: ConditionNode,
+        whatsapp: WhatsAppNode,
+        inventory: InventoryNode,
+        delay: DelayNode,
+        custom: CustomNode 
+    }), []);
 
     // Handle initial workflow data from AI
     useEffect(() => {
@@ -205,6 +219,10 @@ export const WorkflowGraph = ({ workflowData }) => {
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
+                onSelectionChange={(params) => {
+                    const selected = params.nodes[0] || null;
+                    setSelectedNode(selected);
+                }}
                 nodeTypes={nodeTypes}
                 fitView
                 defaultEdgeOptions={{ type: 'smoothstep', animated: true, style: { stroke: '#555', strokeWidth: 2 } }}

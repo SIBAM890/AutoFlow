@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./frontend
+    ports: ["3000:3000"]
+    depends_on: [backend]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    ports: ["8000:8000"]
+    environment:
+      - OLLAMA_URL=http://ollama:11434
+      - WHATSAPP_BRIDGE_URL=http://whatsapp-bridge:3001
+      - DATABASE_URL=sqlite:////app/data/autoflow.db
+    depends_on: [ollama, whatsapp-bridge]
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  whatsapp-bridge:
+    build: ./whatsapp-bridge
+    ports: ["3001:3001"]
+    volumes:
+      - whatsapp_session:/app/.wwebjs_auth
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/status"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  ollama:
+    image: ollama/ollama
+    ports: ["11434:11434"]
+    volumes:
+      - ollama_data:/root/.ollama
+    entrypoint: >
+      sh -c "ollama serve & sleep 8 && ollama pull qwen3:8b && wait"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  ollama_data:
+  whatsapp_session:
