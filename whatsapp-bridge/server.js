@@ -3,6 +3,8 @@ const cors = require('cors');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 app.use(cors());
@@ -10,13 +12,25 @@ app.use(express.json());
 
 const PORT = 3001;
 const WEBHOOK_URL = process.env.WEBHOOK_URL || 'http://backend:8000/api/whatsapp/incoming';
+const AUTH_DIR = '/app/.wwebjs_auth';
+
+// Cleanup stale Chromium locks from previous dirty exits
+try {
+    const lockPath = path.join(AUTH_DIR, 'session', 'SingletonLock');
+    if (fs.existsSync(lockPath)) {
+        fs.unlinkSync(lockPath);
+        console.log('Removed stale Chromium SingletonLock');
+    }
+} catch (e) {
+    console.error('Lock cleanup failed:', e.message);
+}
 
 let isConnected = false;
 let currentQR = null;
 let clientInfo = null;
 
 const client = new Client({
-    authStrategy: new LocalAuth({ dataPath: '/app/.wwebjs_auth' }),
+    authStrategy: new LocalAuth({ dataPath: AUTH_DIR }),
     puppeteer: {
         executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium-browser',
         args: ['--no-sandbox', '--disable-setuid-sandbox']
