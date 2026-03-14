@@ -88,12 +88,63 @@ class WorkflowExecutor:
                 await self._execute_node(nodes[edge["target"]], nodes, next_nodes, context, actions_taken)
 
     async def _run_action(self, node_data: dict, context: dict) -> Any:
+        import os, csv
+        DATA_DIR = "/app/data" if os.environ.get("DATABASE_URL") else "./data"
+
         action_type = node_data.get("action_type")
         config = node_data.get("config", {})
         
         if action_type == "inventory_lookup":
-            # Dummy logic until CSV inventory is implemented
-            return {"quantity": 10}
+            # Extract keywords from the original trigger message to search CSV
+            search_query = str(context.get("trigger", {}).get("message", "")).lower()
+            
+            try:
+                with open(os.path.join(DATA_DIR, "inventory.csv"), "r", encoding="utf-8") as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        product = row["product"].lower().strip()
+                        if product in search_query:
+                            return {
+                                "found": True,
+                                "product": row["product"],
+                                "quantity": int(row["quantity"]),
+                                "price": float(row["price"])
+                            }
+            except Exception as e:
+                print(f"Inventory lookup failed: {e}")
+            return {"found": False, "quantity": 0, "product": search_query}
+            
+        elif action_type == "load_udhaar_list":
+            # Overdue > 7 logic
+            try:
+                with open(os.path.join(DATA_DIR, "udhaar.csv"), "r", encoding="utf-8") as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        if int(row["days_overdue"]) > 7:
+                            # Send reminder
+                            message = f"Hi {row['name']}, friendly reminder: ₹{row['amount']} is due since {row['date']}. Please pay when convenient. - AutoFlow"
+                            await self._send_whatsapp({"to": row["phone"], "message": message}, context)
+                return {"status": "reminders_sent"}
+            except Exception as e:
+                print(f"Udhaar check failed: {e}")
+                return {"status": "failed"}
+
+        elif action_type == "load_customers": # For broadcast
+            try:
+                with open(os.path.join(DATA_DIR, "customers.csv"), "r", encoding="utf-8") as f:
+                    reader = csv.DictReader(f)
+                    numbers = [row["phone"] for row in reader]
+                    message = str(context.get("trigger", {}).get("message", "Promo alert!"))
+                    # The Node.js bridge expects an array for broadcast
+                    async with httpx.AsyncClient() as client:
+                        resp = await client.post(
+                            f"{WHATSAPP_BRIDGE_URL}/broadcast",
+                            json={"numbers": numbers, "message": message},
+                            timeout=60.0
+                        )
+                return {"status": "broadcast_sent"}
+            except Exception as e:
+                return {"status": "failed"}
             
         elif action_type == "log_payment":
             return {"status": "logged"}

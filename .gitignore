@@ -47,3 +47,8 @@ tmp/
 temp/
 auth_info_baileys/
 backend/auth_info_baileys/
+whatsapp-session/
+data/autoflow.db
+data/*.db
+data/*.sqlite
+data/*.sqlite3

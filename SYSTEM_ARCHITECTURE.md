@@ -1,149 +1,103 @@
-# AutoFlow System Architecture
+# AutoFlow OSS 🚀
+> A fully open-source, local-first AI automation platform for Indian MSMEs.
 
-## 1. High-Level Overview
+![AutoFlow Logo](./frontend/public/vite.svg) (*Placeholder for Logo*)
 
-AutoFlow is a hybrid **Pro-Code/No-Code** platform acting as a bridge between **WhatsApp Users** and **Business Logic**. It allows users to visually build (or AI-generate) conversational agents that are deployed to real WhatsApp numbers.
+## 🎯 The Problem
+Small business owners (MSMEs) in India spend hours daily managing WhatsApp queries (inventory, pricing, generic questions) and tracking pending payments (udhaar) manually. Current SaaS automation tools are too complex to build, require cloud dependencies, monthly subscriptions, and expose private business data (like customer numbers and financial ledgers) to third-party endpoints.
 
-The system uses a **decoupled architecture**:
-- **Frontend**: A React-based SPA for the dashboard, builder, and deployment management.
-- **Backend**: A Node.js/Express server handling real-time WhatsApp connections (Baileys), AI processing (Gemini), and data persistence (Google Sheets).
+## 💡 The Solution
+**AutoFlow OSS** is a zero-cloud, 100% locally hosted automation engine. 
+It uses an open-source, lightweight Large Language Model (Ollama running `qwen3:8b`) to allow non-technical shop owners to describe what they want in **Plain English**. 
+>*"If a customer asks for stock on WhatsApp, check my inventory.csv and reply to them automatically."*
+
+The AI converts this request into a structured visual workflow. The native Node.js WhatsApp bridge handles the messaging securely from the user's PC without needing API keys from Meta.
+
+## ✨ Key Features
+*   🗣️ **AI Workflow Generator**: Type plain English; the LLM builds the logic graph instantly.
+*   🔒 **Privacy First (Zero Cloud)**: No API keys. No cloud storage. Your data never leaves your machine.
+*   📦 **Direct Data Connectors**: Plugs natively into your existing local CSV files (e.g., `inventory.csv`, `udhaar.csv`).
+*   🎨 **Visual Canvas**: A beautiful, drag-and-drop ReactFlow builder to tweak the AI's logic graphically.
+*   🔌 **Native WhatsApp Bridge**: Uses `whatsapp-web.js` via local headless Chromium—no Meta API setup required.
 
 ---
 
-## 2. System Architecture Diagram
+## 🏗️ System Architecture
+
+AutoFlow is architected as a set of Dockerized microservices that run seamlessly on standard laptops:
 
 ```mermaid
-flowchart TD
-
-    %% ENTITIES
-    User["Customer (WhatsApp)"]
-    WebVisitor["Website Visitor"]
-    Admin["Admin / Business Owner"]
-    WA_Servers["WhatsApp Servers"]
-    Google_AI["Google Gemini AI"]
-    Google_Sheets["Google Sheets (DB)"]
-
-    %% FRONTEND
-    subgraph Frontend_React_Vite["Frontend (React + Vite)"]
-        direction TB
-
-        subgraph Public_Facing["Public Facing"]
-            Landing_Page["Landing Page"]
-            Hero["Hero Section"]
-            Navbar["Navigation Navbar"]
-        end
-
-        subgraph App_Dashboard["App / Dashboard"]
-            UI_Auth["Auth / Login"]
-            UI_Builder["Logic Builder (ReactFlow)"]
-            UI_Deploy["Deployment Manager"]
-            UI_Dashboard["ROI Dashboard"]
-            UI_Sim["Simulator"]
-        end
+graph TD
+    User([Business Owner]) -->|NL Prompt| F(Frontend UI: React + Vite)
+    F -->|POST /api/workflow/generate| B(Backend API: FastAPI)
+    
+    subgraph Local Environment (Docker)
+        F
+        B
+        O[(Ollama Qwen 2.5/3 8b)]
+        DB[(SQLite)]
+        W(WhatsApp Bridge: Node.js)
+        CSV[Local CSV Files]
     end
 
-    %% BACKEND
-    subgraph Backend_Node_Express["Backend (Node.js + Express)"]
-        API["API Routes (/api)"]
-
-        subgraph Controllers["Controllers"]
-            Ctrl_WA["WhatsApp Controller"]
-            Ctrl_WF["Workflow Controller"]
-        end
-        
-        subgraph Core_Services["Core Services"]
-            Svc_WA["WhatsApp Service (Baileys)"]
-            Svc_Engine["Logic Engine"]
-            Svc_AI["AI Service"]
-            Svc_Sheets["Google Sheet Service"]
-        end
-
-        Session_Store["Local Session Store"]
-    end
-
-    %% CONNECTIONS
-    User -->|E2E Encrypted| WA_Servers
-    WebVisitor -->|Visits| Landing_Page
-    Landing_Page --> Navbar
-    Landing_Page --> Hero
-    Navbar -->|Login| UI_Auth
-    UI_Auth --> UI_Dashboard
-
-    Admin -->|HTTP / WebSocket| UI_Dashboard
-    Admin -->|Interacts| UI_Builder
-
-    %% Frontend <-> Backend
-    UI_Deploy -->|POST /whatsapp/deploy| API
-    UI_Sim -->|POST /simulate-message| API
-    UI_Builder -->|POST /generate-workflow| API
-
-    API --> Ctrl_WA
-    API --> Ctrl_WF
-
-    Ctrl_WWA --> Svc_WA
-    Ctrl_WF --> Svc_AI
-
-    Svc_WA -->|WebSocket| WA_Servers
-    Svc_WA -->|Persist Auth| Session_Store
-    Svc_WA -->|Incoming Msg| Svc_Engine
-    Svc_Engine -->|Reply| Svc_WA
-
-    Svc_Engine -->|Read/Write| Svc_Sheets
-    Svc_Engine -.->|AI Logic| Svc_AI
-
-    Svc_Sheets -->|REST| Google_Sheets
-    Svc_AI -->|REST| Google_AI
-
+    B -->|Generate JSON| O
+    B -->|Store Workflow| DB
+    B -->|Read/Write| CSV
+    
+    C([Customer on WhatsApp]) <-->|Messages| W
+    W -->|Webhook /api/whatsapp/incoming| B
+    B -->|Execute Action Commands| W
 ```
 
----
-
-## 3. Component Breakdown
-
-### A. Frontend Layer (React)
-- **Landing Page Module (`src/components/landing`)**:
-    - **Hero Section**: High-conversion entry point with 3D animations and typed text effects.
-    - **Navbar**: Responsive navigation with mobile menu support.
-    - **Features/Comparison**: Showcases the value prop against traditional methods.
-- **Deployment Manager (`DeployPage.jsx`)**: Handles the critical QR code handshake. It polls the backend status and renders the QR code generated by the Baileys library.
-- **Logic Builder (`Builder.jsx`)**: Uses `ReactFlow` to visualize conversation nodes. It communicates with the **AI Service** to generate workflows from natural language prompts.
-- **Simulator (`TestMode.jsx`)**: Allows testing the agent without a real WhatsApp connection. It sends messages directly to the `Logic Engine` via the `/simulate-message` endpoint.
-
-### B. Backend Layer (Node.js/Express)
-- **WhatsApp Service (`whatsapp.service.js`)**: The core communication layer. It uses `@whiskeysockets/baileys` to emulate a browser-based WhatsApp Web client. It manages the WebSocket connection, handles encryption, and emits events for incoming messages.
-- **Logic Engine (`engine.service.js`)**: The brain of the bot. Currently, it uses a **hybrid approach**:
-    - **Rule-Based**: High-speed regex matching for common intents (Store hours, greetings).
-    - **Data-Driven**: Queries Google Sheets for dynamic data (Product lookup, Order tracking).
-- **Google Sheet Service (`googleSheet.service.js`)**: Acts as the database.
-    - **Inventory Sync**: Reads product data (Stock, Price) in real-time.
-    - **Order Logging**: Appends new rows for incoming orders with IDs and timestamps.
-- **AI Service (`ai.service.js`)**:
-    - **Generation**: specific prompt engineering to convert user descriptions (e.g., "Shoe store agent") into structured JSON workflows.
-    - **Explanation**: Converts JSON workflows back into human-readable summaries.
-
-### C. Data Persistence
-- **Google Sheets**: Serves as a lightweight, user-accessible CMS/Database. Users can manage inventory directly in Sheets, and the bot reflects changes immediately.
-- **Local Filesystem**: Used for storing WhatsApp Session credentials (`auth_info_baileys`). This ensures the bot stays logged in across server restarts.
+### Tech Stack
+| Component | Technology | Description |
+|-----------|------------|-------------|
+| **AI LLM Engine** | Ollama | Native AI host running Qwen 2.5/3 (8b) local model |
+| **Backend Core** | FastAPI (Python) | High-performance async routing, handles the Execution DAG |
+| **Database** | SQLite + SQLModel | Serverless local storage mapped to `./data/` |
+| **Frontend UI** | React + Vite + Zustand | Fast configuration panel with rich ReactFlow visualization |
+| **Messaging** | Node.js + WWebJS | Local chromium session bridging real WhatsApp |
 
 ---
 
-## 4. Key Workflows
+## 🏃 Quick Start Guide
 
-### 1. Agent Deployment
-1. Admin visits **Deploy Page**.
-2. Frontend requests QR code from Backend.
-3. **WhatsApp Service** establishes WebSocket with WhatsApp Servers.
-4. User scans QR code.
-5. Session credentials are saved locally.
-6. Connection is established ("Open" state).
+Ensure you have **Docker** and **Docker-Compose** installed on your system.
+*(Note: The first run must download the 4.7GB Ollama Model. Subsequent runs are instant.)*
 
-### 2. Message Processing Loop
-1. **User** sends "Do you have Nike shoes?" on WhatsApp.
-2. **WhatsApp Service** receives encrypted payload, decrypts it, and extracts text.
-3. **Logic Engine** analyzes text:
-   - Detects keyword "Nike".
-   - Identifies intent: `product_inquiry`.
-4. **Google Sheet Service** is called to search "Nike" in the Inventory Sheet.
-5. Returns: `{ found: true, stock: 5, price: 5000 }`.
-6. **Logic Engine** formats response: "Yes! We have Nike shoes in stock..."
-7. **WhatsApp Service** sends reply to User.
+```bash
+git clone https://github.com/nexis-team/autoflow-oss.git
+cd autoflow-oss
+
+# Spin up all 4 microservices
+docker-compose up --build
+```
+
+### Accessing the Services:
+- **Frontend Builder**: [http://localhost:3000](http://localhost:3000)
+- **Backend API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **WhatsApp Bridge Status**: [http://localhost:3001/status](http://localhost:3001/status)
+
+### Linking WhatsApp:
+1. Check the Docker terminal output for the `whatsapp-bridge` container.
+2. It will print a large QR code.
+3. Open WhatsApp on your phone -> Linked Devices -> Link a Device.
+4. Scan the terminal QR code. The bridge will emit `Client is ready!`.
+
+---
+
+## 🧪 Demo Workflows
+
+The SQLite database drops with pre-seeded templates to demonstrate the FOSS Hack goals:
+1. **Stock Query Auto-Reply**: Reads `data/inventory.csv` to answer product stock queries dynamically.
+2. **Udhaar Payment Reminder**: Evaluates `data/udhaar.csv` for days overdue > 7, and blasts targeted WhatsApp reminders.
+3. **Customer Broadcast**: Loads a list of numbers from `data/customers.csv` and sends bulk announcements.
+
+---
+
+## 👨‍💻 Team
+Built with ❤️ by **Team Nexis** for the **FOSS Hack 2026**.
+*Sri Sri University FET*
+
+## 📜 License
+This project is licensed under the [MIT License](LICENSE).

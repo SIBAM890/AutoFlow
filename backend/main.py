@@ -8,13 +8,27 @@ import models
 from schemas import WorkflowGenerateRequest, WorkflowSchema
 from ollama_client import generate_workflow, explain_workflow
 from executor import WorkflowExecutor
+from seeder import seed_database
+
+# Routers
+from routers.inventory import router as inventory_router
+from routers.templates import router as templates_router
+from routers.audit import router as audit_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_db_and_tables()
+    # Seed DB with initial data
+    with Session(database.engine) as session:
+        seed_database(session)
     yield
 
 app = FastAPI(lifespan=lifespan, title="AutoFlow OSS Backend")
+
+# Register routers
+app.include_router(inventory_router)
+app.include_router(templates_router)
+app.include_router(audit_router)
 
 @app.get("/docs")
 def health():
