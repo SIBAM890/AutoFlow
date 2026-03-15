@@ -5,6 +5,9 @@ services:
     build: ./frontend
     ports: ["3000:3000"]
     depends_on: [backend]
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
       interval: 15s

@@ -85,8 +85,17 @@ const getLayoutedElements = (nodes, edges) => {
     });
 };
 
+const defaultEdgeOptions = { type: 'smoothstep', animated: true, style: { stroke: '#555', strokeWidth: 2 } };
+
 export const WorkflowGraph = ({ workflowData }) => {
-    const { nodes, edges, setNodes, setEdges, onNodesChange, onEdgesChange, setSelectedNode } = useWorkflowStore();
+    const nodes = useWorkflowStore(state => state.nodes);
+    const edges = useWorkflowStore(state => state.edges);
+    const setNodes = useWorkflowStore(state => state.setNodes);
+    const setEdges = useWorkflowStore(state => state.setEdges);
+    const onNodesChange = useWorkflowStore(state => state.onNodesChange);
+    const onEdgesChange = useWorkflowStore(state => state.onEdgesChange);
+    const setSelectedNode = useWorkflowStore(state => state.setSelectedNode);
+
     const reactFlowInstance = useReactFlow();
     const reactFlowWrapper = useRef(null);
 
@@ -206,6 +215,11 @@ export const WorkflowGraph = ({ workflowData }) => {
         [reactFlowInstance, setNodes]
     );
 
+    const handleSelectionChange = useCallback((params) => {
+        const selected = params.nodes[0] || null;
+        setSelectedNode(selected);
+    }, [setSelectedNode]);
+
     return (
         <div
             className="w-full h-full bg-[#0a0a0a]"
@@ -219,13 +233,10 @@ export const WorkflowGraph = ({ workflowData }) => {
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
-                onSelectionChange={(params) => {
-                    const selected = params.nodes[0] || null;
-                    setSelectedNode(selected);
-                }}
+                onSelectionChange={handleSelectionChange}
                 nodeTypes={nodeTypes}
                 fitView
-                defaultEdgeOptions={{ type: 'smoothstep', animated: true, style: { stroke: '#555', strokeWidth: 2 } }}
+                defaultEdgeOptions={defaultEdgeOptions}
             >
                 <Background color="#333" gap={24} size={1.5} variant="dots" />
                 <Controls className="!bg-[#1e1e1e] !border-[#333] !fill-white [&>button]:!fill-gray-400 [&>button:hover]:!fill-white" />
