@@ -31,8 +31,17 @@ const client = new Client({
     authStrategy: new LocalAuth({ dataPath: AUTH_DIR }),
     puppeteer: {
         executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium-browser',
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-        timeout: 60000
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+            '--disable-extensions',
+            '--disable-software-rasterizer',
+            '--single-process'
+        ],
+        timeout: 120000,
+        protocolTimeout: 120000
     }
 });
 
@@ -72,7 +81,32 @@ client.on('disconnected', (reason) => {
     clientInfo = null;
 });
 
-client.initialize();
+// Start Express server FIRST so /status endpoint is always available
+app.listen(PORT, () => {
+    console.log(`WhatsApp Bridge running on port ${PORT}`);
+});
+
+// Initialize WhatsApp client with retry logic (non-blocking)
+const initWithRetry = async (maxRetries = 3) => {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            console.log(`WhatsApp client initializing (attempt ${attempt}/${maxRetries})...`);
+            await client.initialize();
+            console.log('WhatsApp client initialized successfully');
+            return;
+        } catch (err) {
+            console.error(`Initialization attempt ${attempt} failed:`, err.message);
+            if (attempt < maxRetries) {
+                console.log(`Retrying in 10 seconds...`);
+                await new Promise(r => setTimeout(r, 10000));
+            } else {
+                console.error('All initialization attempts failed. Server still running — retry manually or restart container.');
+            }
+        }
+    }
+};
+
+initWithRetry();
 
 // REST API
 app.get('/status', (req, res) => {
@@ -121,6 +155,3 @@ app.post('/broadcast', async (req, res) => {
     res.json({ success: true, totalSent: sent });
 });
 
-app.listen(PORT, () => {
-    console.log(`WhatsApp Bridge running on port ${PORT}`);
-});

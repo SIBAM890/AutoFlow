@@ -67,7 +67,7 @@ async def generate_workflow(nl_input: str, is_retry: bool = False) -> Dict[str, 
                             "num_predict": 2048
                         }
                     },
-                    timeout=60.0
+                    timeout=300.0  # CPU inference can take 2-3 min for qwen3:8b
                 )
                 response.raise_for_status()
                 raw = response.json().get("message", {}).get("content", "")
@@ -113,7 +113,7 @@ async def explain_workflow(workflow_json: Dict[str, Any]) -> str:
                             "num_predict": 512
                         }
                     },
-                    timeout=30.0
+                    timeout=120.0  # Explanation is shorter, but still needs time on CPU
                 )
                 response.raise_for_status()
                 raw = response.json().get("message", {}).get("content", "")
