@@ -90,6 +90,14 @@ app.listen(PORT, () => {
 const initWithRetry = async (maxRetries = 3) => {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
+            // Kill any stale Chromium processes and lock files before each attempt
+            try {
+                const { execSync } = require('child_process');
+                execSync('pkill -f chromium 2>/dev/null || true');
+                execSync(`find ${AUTH_DIR} -name "Singleton*" -delete 2>/dev/null || true`);
+                execSync(`find ${AUTH_DIR} -name "*.lock" -delete 2>/dev/null || true`);
+            } catch (e) { /* ignore cleanup errors */ }
+
             console.log(`WhatsApp client initializing (attempt ${attempt}/${maxRetries})...`);
             await client.initialize();
             console.log('WhatsApp client initialized successfully');
@@ -97,8 +105,8 @@ const initWithRetry = async (maxRetries = 3) => {
         } catch (err) {
             console.error(`Initialization attempt ${attempt} failed:`, err.message);
             if (attempt < maxRetries) {
-                console.log(`Retrying in 10 seconds...`);
-                await new Promise(r => setTimeout(r, 10000));
+                console.log(`Cleaning up and retrying in 15 seconds...`);
+                await new Promise(r => setTimeout(r, 15000));
             } else {
                 console.error('All initialization attempts failed. Server still running — retry manually or restart container.');
             }

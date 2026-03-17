@@ -5,8 +5,9 @@ import asyncio
 from typing import Dict, Any
 
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3:1.7b")
 
-SYSTEM_PROMPT = """
+SYSTEM_PROMPT = """/no_think
 You are AutoFlow, an AI that converts business automation requests into structured workflow JSON.
 
 You have access to these node types:
@@ -22,6 +23,7 @@ Rules:
 3. Use {{variable}} syntax for dynamic values
 4. Position nodes left-to-right with x incrementing by 200, y centered at 200
 5. Return ONLY valid JSON matching the workflow schema. No explanation, no markdown.
+6. Do NOT wrap in code blocks. Start with { and end with }.
 """
 
 USER_PROMPT = """
@@ -56,15 +58,15 @@ async def generate_workflow(nl_input: str, is_retry: bool = False) -> Dict[str, 
                 response = await client.post(
                     f"{OLLAMA_URL}/api/chat",
                     json={
-                        "model": "qwen3:8b",
+                        "model": OLLAMA_MODEL,
                         "messages": [
                             {"role": "system", "content": SYSTEM_PROMPT},
                             {"role": "user", "content": prompt}
                         ],
                         "stream": False,
                         "options": {
-                            "temperature": 0.1 if is_retry else 0.2, # Lower temp on retry
-                            "num_predict": 2048
+                            "temperature": 0.1 if is_retry else 0.2,
+                            "num_predict": 1024
                         }
                     },
                     timeout=300.0  # CPU inference can take 2-3 min for qwen3:8b
@@ -102,7 +104,7 @@ async def explain_workflow(workflow_json: Dict[str, Any]) -> str:
                 response = await client.post(
                     f"{OLLAMA_URL}/api/chat",
                     json={
-                        "model": "qwen3:8b",
+                        "model": OLLAMA_MODEL,
                         "messages": [
                             {"role": "system", "content": EXPLAINER_PROMPT},
                             {"role": "user", "content": f"Workflow JSON:\n{json.dumps(workflow_json)}"}

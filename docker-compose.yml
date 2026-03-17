@@ -49,7 +49,7 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     entrypoint: >
-      sh -c "ollama serve & sleep 8 && ollama pull qwen3:8b && wait"
+      sh -c "ollama serve & sleep 8 && ollama pull qwen3:1.7b && wait"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
       interval: 15s
