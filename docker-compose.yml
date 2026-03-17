@@ -36,12 +36,7 @@ services:
     build: ./whatsapp-bridge
     ports: ["3001:3001"]
     volumes:
-      - whatsapp_session:/app/.wwebjs_auth
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/status"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
+      - whatsapp_session:/app/auth_info_baileys
 
   ollama:
     image: ollama/ollama
