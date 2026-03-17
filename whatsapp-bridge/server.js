@@ -2,8 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const fs = require('fs');
-const makeWASocket = require('@whiskeysockets/baileys').default;
-const { useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
+const qrcode = require('qrcode-terminal');
+const makeWASocket = require('baileys').default;
+const { useMultiFileAuthState, DisconnectReason } = require('baileys');
 
 const app = express();
 app.use(cors());
@@ -18,6 +19,8 @@ let sock = null;
 let isConnected = false;
 let isConnecting = false;
 let qrCode = null;
+let reconnectAttempts = 0;
+const MAX_RECONNECT = 10;
 
 // ─── WhatsApp Connection ─────────────────────────────────
 const connectToWhatsApp = async () => {
@@ -33,7 +36,7 @@ const connectToWhatsApp = async () => {
     isConnecting = true;
     qrCode = null;
 
-    // Ensure previous socket is dead before starting new one
+    // Cleanup previous socket
     if (sock) {
         try {
             sock.ev.removeAllListeners();
@@ -49,20 +52,17 @@ const connectToWhatsApp = async () => {
 
         sock = makeWASocket({
             auth: state,
-            printQRInTerminal: true,
-            logger: require('pino')({ level: 'silent' })
+            printQRInTerminal: false, // We handle QR ourselves
+            logger: require('pino')({ level: 'silent' }),
+            browser: ['AutoFlow', 'Chrome', '1.0.0']
         });
 
-        let isClosed = false;
-
-        // Save credentials on update
-        sock.ev.on('creds.update', async (creds) => {
+        // Save credentials
+        sock.ev.on('creds.update', async () => {
             try {
-                if (fs.existsSync(AUTH_DIR)) {
-                    await saveCreds(creds);
-                }
+                await saveCreds();
             } catch (e) {
-                // Ignore save errors during cleanup
+                // Ignore
             }
         });
 
@@ -70,64 +70,71 @@ const connectToWhatsApp = async () => {
         sock.ev.on('connection.update', async (update) => {
             const { connection, lastDisconnect, qr } = update;
 
-            // Capture QR Code
+            // ── QR Code ────────────────────
             if (qr) {
-                console.log('📸 QR Code Generated!');
+                console.log('\n📸 ═══════ SCAN THIS QR CODE ═══════');
+                qrcode.generate(qr, { small: true });
+                console.log('════════════════════════════════════\n');
                 qrCode = qr;
+                reconnectAttempts = 0; // Reset on QR (we're making progress)
             }
 
-            if (connection === 'close') {
-                if (isClosed) return;
-                isClosed = true;
-
-                const statusCode = lastDisconnect?.error?.output?.statusCode;
-                const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
-
-                console.log(`❌ Connection closed. Status: ${statusCode}, Reconnect: ${shouldReconnect}`);
-
-                isConnected = false;
-                qrCode = null;
-                sock?.ev?.removeAllListeners();
-
-                if (!shouldReconnect) {
-                    console.log('⚠️ Session Invalidated/Logged Out. Cleaning up...');
-                    isConnecting = false;
-                    try { sock?.end(); } catch (e) { }
-                    sock = null;
-
-                    try {
-                        await new Promise(r => setTimeout(r, 500));
-                        fs.rmSync(AUTH_DIR, { recursive: true, force: true });
-                        console.log('📂 Session files deleted.');
-                    } catch (e) {
-                        console.error('Failed to delete session files:', e.message);
-                    }
-                } else {
-                    console.log('🔄 Auto-reconnecting in 3s...');
-                    isConnecting = false;
-                    try { sock?.end(); } catch (e) { }
-                    sock = null;
-
-                    setTimeout(() => {
-                        connectToWhatsApp();
-                    }, 3000);
-                }
-            }
-
+            // ── Connection Opened ──────────
             if (connection === 'open') {
                 console.log('✅ WhatsApp Connected Successfully!');
                 isConnected = true;
                 isConnecting = false;
                 qrCode = null;
+                reconnectAttempts = 0;
+            }
+
+            // ── Connection Closed ──────────
+            if (connection === 'close') {
+                isConnected = false;
+
+                const statusCode = lastDisconnect?.error?.output?.statusCode;
+                const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+
+                console.log(`Connection closed. Status: ${statusCode || 'initial'}, Reconnect: ${shouldReconnect}`);
+
+                // Cleanup
+                try { sock?.ev?.removeAllListeners(); } catch (e) { }
+                try { sock?.end(); } catch (e) { }
+                sock = null;
+                isConnecting = false;
+
+                if (!shouldReconnect) {
+                    // Logged out — clear session
+                    console.log('⚠️ Logged out. Clearing session...');
+                    qrCode = null;
+                    reconnectAttempts = 0;
+                    try {
+                        await new Promise(r => setTimeout(r, 500));
+                        fs.rmSync(AUTH_DIR, { recursive: true, force: true });
+                        console.log('📂 Session cleared. Call /deploy to reconnect.');
+                    } catch (e) {
+                        console.error('Failed to delete session:', e.message);
+                    }
+                } else if (reconnectAttempts < MAX_RECONNECT) {
+                    reconnectAttempts++;
+                    const delay = Math.min(3000 * reconnectAttempts, 30000); // Exponential backoff, max 30s
+                    console.log(`🔄 Reconnecting (${reconnectAttempts}/${MAX_RECONNECT}) in ${delay / 1000}s...`);
+                    setTimeout(() => connectToWhatsApp(), delay);
+                } else {
+                    console.error(`❌ Max reconnect attempts (${MAX_RECONNECT}) reached. Call /deploy to retry.`);
+                    reconnectAttempts = 0;
+                }
             }
         });
 
-        // Message handler — forward to backend webhook
+        // ── Incoming Messages ────────────
         sock.ev.on('messages.upsert', async ({ messages }) => {
             const msg = messages[0];
             if (!msg.message || msg.key.fromMe) return;
 
             const sender = msg.key.remoteJid;
+            if (sender === 'status@broadcast') return;
+
             const userMessage =
                 msg.message.conversation ||
                 msg.message.extendedTextMessage?.text ||
@@ -135,7 +142,6 @@ const connectToWhatsApp = async () => {
                 null;
 
             if (!userMessage) return;
-            if (sender === 'status@broadcast') return;
 
             console.log(`📩 Message from ${sender}: ${userMessage}`);
 
@@ -153,7 +159,7 @@ const connectToWhatsApp = async () => {
         return { status: 'initiated' };
 
     } catch (e) {
-        console.error('❌ WhatsApp Connection Failed:', e.message);
+        console.error('❌ Connection Failed:', e.message);
         isConnecting = false;
         return { error: e.message };
     }
@@ -167,7 +173,7 @@ app.get('/status', (req, res) => {
         connected: isConnected,
         connecting: isConnecting,
         qr: qrCode,
-        phone: null
+        reconnectAttempts
     });
 });
 
@@ -176,6 +182,8 @@ app.get('/qr', (req, res) => {
 });
 
 app.post('/deploy', async (req, res) => {
+    reconnectAttempts = 0; // Reset on manual deploy
+    isConnecting = false;  // Allow fresh connection
     const result = await connectToWhatsApp();
     res.json(result);
 });
@@ -185,7 +193,6 @@ app.post('/send', async (req, res) => {
     if (!to || !message) {
         return res.status(400).json({ error: "Missing 'to' or 'message'" });
     }
-
     if (!isConnected || !sock) {
         return res.status(503).json({ error: 'WhatsApp not connected' });
     }
@@ -204,7 +211,6 @@ app.post('/broadcast', async (req, res) => {
     if (!numbers || !Array.isArray(numbers) || !message) {
         return res.status(400).json({ error: 'Invalid broadcast payload' });
     }
-
     if (!isConnected || !sock) {
         return res.status(503).json({ error: 'WhatsApp not connected' });
     }
@@ -225,7 +231,8 @@ app.post('/broadcast', async (req, res) => {
 app.post('/logout', async (req, res) => {
     try {
         if (sock) {
-            sock.end(undefined);
+            sock.ev.removeAllListeners();
+            sock.end();
             sock = null;
         }
     } catch (e) {
@@ -235,6 +242,7 @@ app.post('/logout', async (req, res) => {
     isConnected = false;
     isConnecting = false;
     qrCode = null;
+    reconnectAttempts = 0;
 
     try {
         console.log('⚠️ Manual Logout. Clearing session...');
@@ -245,9 +253,10 @@ app.post('/logout', async (req, res) => {
     }
 });
 
-// ─── Start Server & Connect ──────────────────────────────
+// ─── Start ───────────────────────────────────────────────
 app.listen(PORT, () => {
-    console.log(`WhatsApp Bridge running on port ${PORT}`);
-    // Auto-start WhatsApp connection
+    console.log(`\n🚀 WhatsApp Bridge running on port ${PORT}`);
+    console.log(`   Webhook: ${WEBHOOK_URL}`);
+    console.log(`   Starting WhatsApp connection...\n`);
     connectToWhatsApp();
 });
