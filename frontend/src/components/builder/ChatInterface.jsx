@@ -3,14 +3,14 @@ import { MessageBubble } from './MessageBubble';
 import { ChatInput } from './ChatInput';
 import { TypingIndicator } from './TypingIndicator';
 import { workflowApi } from '../../services/workflowApi';
-import { Paperclip, FileText, X } from 'lucide-react'; // Import Icons
+import { Paperclip, FileText, X } from 'lucide-react';
 
 export const ChatInterface = ({ onWorkflowGenerated }) => {
     const [messages, setMessages] = useState([
         { role: 'ai', content: "🤖 Hi! I'm AutoFlow. Upload your inventory file (Excel/CSV) for better accuracy, or just describe what you need!" }
     ]);
     const [isLoading, setIsLoading] = useState(false);
-    const [uploadedFile, setUploadedFile] = useState(null); // { name, context }
+    const [uploadedFile, setUploadedFile] = useState(null);
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
 
@@ -29,48 +29,51 @@ export const ChatInterface = ({ onWorkflowGenerated }) => {
         setIsLoading(true);
         try {
             const data = await workflowApi.uploadFile(file);
-            setUploadedFile({ name: data.fileName, context: data.context });
+            setUploadedFile({ name: data.name || file.name, id: data.id });
             setMessages(prev => [...prev, {
                 role: 'system',
-                content: `📂 Attached: ${data.fileName} (I'll use this data for your next workflow)`
+                content: `📂 Attached: ${file.name} (I'll use this data for your next workflow)`
             }]);
         } catch (error) {
-            setMessages(prev => [...prev, { role: 'system', content: "❌ Upload Failed: " + error.response?.data?.error || error.message }]);
+            setMessages(prev => [...prev, { role: 'system', content: "❌ Upload Failed: " + (error.response?.data?.detail || error.message) }]);
         } finally {
             setIsLoading(false);
-            if (fileInputRef.current) fileInputRef.current.value = ""; // Reset
+            if (fileInputRef.current) fileInputRef.current.value = "";
         }
     };
 
     const clearFile = () => setUploadedFile(null);
 
     const handleSend = async (text) => {
-        // Add user message
         setMessages(prev => [...prev, { role: 'user', content: text }]);
         setIsLoading(true);
 
         try {
-            // Call API with File Context
-            const fileContext = uploadedFile?.context || null;
-            const data = await workflowApi.generate(text, fileContext);
+            const data = await workflowApi.generate(text);
 
-            // Add AI response
-            setMessages(prev => [...prev, {
-                role: 'ai',
-                content: "✅ Workflow generated based on your request" + (fileContext ? " and file data." : ".")
-            }]);
+            if (data.success && data.workflow) {
+                setMessages(prev => [...prev, {
+                    role: 'ai',
+                    content: data.explanation
+                        ? `✅ Workflow generated!\n\n${data.explanation}`
+                        : "✅ Workflow generated based on your request."
+                }]);
 
-            // Pass workflow data to parent
-            if (onWorkflowGenerated && data.workflow) {
-                onWorkflowGenerated(data.workflow);
+                if (onWorkflowGenerated) {
+                    onWorkflowGenerated(data.workflow);
+                }
+            } else {
+                setMessages(prev => [...prev, {
+                    role: 'ai',
+                    content: "⚠️ I generated a response but couldn't parse a valid workflow. Try describing your automation more clearly.",
+                    error: true
+                }]);
             }
-
-            // Optional: Clear file after use? Or keep it? Let's keep it for context unless manually cleared.
-
         } catch (error) {
+            const detail = error.response?.data?.detail || error.message;
             setMessages(prev => [...prev, {
                 role: 'ai',
-                content: "❌ Sorry, I encountered an error while building the workflow. Please try again.",
+                content: `❌ Sorry, I encountered an error: ${detail}. The AI model might be loading — please try again in a moment.`,
                 error: true
             }]);
         } finally {

@@ -2,7 +2,14 @@ import { create } from 'zustand';
 import { applyNodeChanges, applyEdgeChanges } from 'reactflow';
 
 export const useWorkflowStore = create((set, get) => ({
-  nodes: [],
+  nodes: [
+    {
+      id: '1',
+      position: { x: 100, y: 200 },
+      data: { label: 'Your Agent', category: 'AutoFlow', type: 'trigger' },
+      type: 'custom'
+    }
+  ],
   edges: [],
   currentWorkflow: null, // Holds id, name, description, etc.
   isActive: false,
