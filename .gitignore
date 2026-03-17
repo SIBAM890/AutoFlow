@@ -52,3 +52,4 @@ data/autoflow.db
 data/*.db
 data/*.sqlite
 data/*.sqlite3
+backend/autoflow.db
