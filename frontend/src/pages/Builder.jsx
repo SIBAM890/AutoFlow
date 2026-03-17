@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ReactFlowProvider } from 'reactflow';
 import { WorkflowGraph } from '../components/visualization/WorkflowGraph';
 import { ChatInterface } from '../components/builder/ChatInterface';
+import { NodePalette } from '../components/builder/NodePalette';
 import { Zap, Play, Rocket, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -32,18 +33,19 @@ export default function Builder() {
           {/* Customization Mode Toggle */}
           <button
             onClick={() => setCustomizationMode(!customizationMode)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all hover:bg-gray-50"
-            style={{
-              borderColor: customizationMode ? '#22c55e' : '#d1d5db',
-              color: customizationMode ? '#16a34a' : '#6b7280',
-            }}
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold border-2 transition-all duration-300 ${
+              customizationMode
+                ? 'border-purple-400 bg-purple-50 text-purple-700 shadow-md shadow-purple-100'
+                : 'border-gray-300 bg-white text-gray-500 hover:border-gray-400'
+            }`}
           >
-            <span className={`w-2 h-2 rounded-full ${customizationMode ? 'bg-green-500' : 'bg-gray-400'}`} />
+            <span className={`w-2 h-2 rounded-full transition-colors ${customizationMode ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
+            <Settings size={14} className={customizationMode ? 'text-purple-500' : 'text-gray-400'} />
             Customization Mode: {customizationMode ? 'ON' : 'OFF'}
           </button>
 
           {/* Test Logic Button */}
-          <button className="flex items-center gap-1.5 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm">
+          <button className="flex items-center gap-1.5 bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm">
             <Play size={14} fill="currentColor" />
             Test Logic
           </button>
@@ -51,7 +53,7 @@ export default function Builder() {
           {/* Deploy Button */}
           <button
             onClick={() => navigate('/deploy-agent')}
-            className="flex items-center gap-1.5 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm"
+            className="flex items-center gap-1.5 bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm"
           >
             <Rocket size={14} />
             Deploy
@@ -74,11 +76,20 @@ export default function Builder() {
           </div>
         </div>
 
-        {/* Right — React Flow Canvas */}
+        {/* Center — React Flow Canvas */}
         <div className="flex-1 relative">
           <ReactFlowProvider>
             <WorkflowGraph workflowData={workflowData} />
           </ReactFlowProvider>
+        </div>
+
+        {/* Right Sidebar — Toolbox (only when Customization Mode is ON) */}
+        <div
+          className={`shrink-0 transition-all duration-300 ease-in-out overflow-hidden ${
+            customizationMode ? 'w-[280px] opacity-100' : 'w-0 opacity-0'
+          }`}
+        >
+          {customizationMode && <NodePalette />}
         </div>
       </div>
     </div>
