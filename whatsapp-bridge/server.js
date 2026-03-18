@@ -112,7 +112,12 @@ const connectToWhatsApp = async () => {
                     reconnectAttempts = 0;
                     try {
                         await new Promise(r => setTimeout(r, 500));
-                        fs.rmSync(AUTH_DIR, { recursive: true, force: true });
+                        if (fs.existsSync(AUTH_DIR)) {
+                            const files = fs.readdirSync(AUTH_DIR);
+                            for (const file of files) {
+                                fs.rmSync(`${AUTH_DIR}/${file}`, { recursive: true, force: true });
+                            }
+                        }
                         console.log('📂 Session cleared. Call /deploy to reconnect.');
                     } catch (e) {
                         console.error('Failed to delete session:', e.message);
@@ -248,7 +253,12 @@ app.post('/logout', async (req, res) => {
 
     try {
         console.log('⚠️ Manual Logout. Clearing session...');
-        fs.rmSync(AUTH_DIR, { recursive: true, force: true });
+        if (fs.existsSync(AUTH_DIR)) {
+            const files = fs.readdirSync(AUTH_DIR);
+            for (const file of files) {
+                fs.rmSync(`${AUTH_DIR}/${file}`, { recursive: true, force: true });
+            }
+        }
         res.json({ success: true });
     } catch (e) {
         res.status(500).json({ success: false, error: e.message });
