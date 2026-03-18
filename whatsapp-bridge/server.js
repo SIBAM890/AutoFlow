@@ -93,7 +93,9 @@ const connectToWhatsApp = async () => {
                 isConnected = false;
 
                 const statusCode = lastDisconnect?.error?.output?.statusCode;
-                const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+                // 401 = Logged Out
+                // 405 = Not Acceptable / Corrupt Session Data
+                const shouldReconnect = statusCode !== DisconnectReason.loggedOut && statusCode !== 405;
 
                 console.log(`Connection closed. Status: ${statusCode || 'initial'}, Reconnect: ${shouldReconnect}`);
 
