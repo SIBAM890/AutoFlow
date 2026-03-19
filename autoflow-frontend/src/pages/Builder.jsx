@@ -3,12 +3,13 @@ import { ReactFlowProvider } from 'reactflow';
 import { WorkflowGraph } from '../components/visualization/WorkflowGraph';
 import { ChatInterface } from '../components/builder/ChatInterface';
 import { NodePalette } from '../components/builder/NodePalette';
-import { Play, Download, Settings, MousePointer2, Move } from 'lucide-react';
+import { Zap, Play, Rocket, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Builder() {
   const [workflowData, setWorkflowData] = useState(null);
-  const [activeTab, setActiveTab] = useState("chat"); // 'chat' | 'settings'
+  const [customizationMode, setCustomizationMode] = useState(false);
+
   const navigate = useNavigate();
 
   const handleWorkflowGenerated = (workflow) => {
@@ -16,96 +17,81 @@ export default function Builder() {
   };
 
   return (
-    <div className="flex w-screen h-screen bg-[#1e1e1e] overflow-hidden text-sm font-sans">
-      
-      {/* ── LEFT PANEL: Toolbox ──────────────────────────────── */}
-      <aside className="w-64 border-r border-black/40 bg-[#252526] shrink-0 flex flex-col z-20 shadow-xl">
-        <div className="p-4 border-b border-black/40">
-           <h3 className="font-semibold text-white tracking-wide uppercase text-xs flex items-center gap-2">
-             <span className="w-2 h-2 rounded-full bg-purple-500"></span> Toolbox
-           </h3>
-        </div>
-        
-        {/* Real functional palette embedded here */}
-        <div className="flex-1 overflow-y-auto">
-           {/* If NodePalette has white backgrounds, we might need to modify it later, but here is the logic integration */}
-           <NodePalette />
-        </div>
-        
-        <div className="p-3 border-t border-black/40 text-center text-xs text-gray-500">
-           Drag & Drop to build
-        </div>
-      </aside>
-
-      {/* ── CENTER PANEL: Canvas ──────────────────────────────── */}
-      <main className="flex-1 relative flex flex-col bg-[#1e1e1e]">
-        
-        {/* Header toolbar over canvas */}
-        <header className="absolute top-0 left-0 right-0 flex items-center justify-between border-b border-black/40 px-6 py-4 bg-[#252526]/90 backdrop-blur z-50 w-full shadow-sm">
-          <div className="flex items-center gap-4">
-            <h2 className="text-sm font-semibold text-white">AutoFlow Lead Generation</h2>
-            <div className="px-2 py-0.5 bg-green-500/10 text-green-400 border border-green-500/20 rounded text-[10px] font-bold uppercase tracking-wide">Saved</div>
+    <div className="h-screen w-screen flex flex-col overflow-hidden font-sans">
+      {/* ── Top Bar ───────────────────────────────────── */}
+      <div className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-5 z-50 shrink-0">
+        {/* Left: Logo + Title */}
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center shadow-sm">
+            <Zap size={16} className="text-white" fill="currentColor" />
           </div>
-          
-          <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 hover:bg-white/10 text-gray-300 rounded font-medium text-xs transition-colors">
-              <Download className="w-3.5 h-3.5" /> Export
-            </button>
-            <button 
-              onClick={() => navigate('/deploy-agent')}
-              className="flex items-center gap-2 px-3 py-1.5 bg-[#ff6d5a] hover:bg-[#ff6d5a]/90 text-white rounded font-medium text-xs shadow-md transition-colors"
-            >
-              <Play className="w-3.5 h-3.5 fill-current" /> Deploy Agent
-            </button>
-          </div>
-        </header>
-
-        {/* Canvas controls */}
-        <div className="absolute top-20 left-6 flex gap-2 z-40">
-           <div className="bg-[#252526] border border-black/40 p-2 rounded-lg shadow-lg flex items-center justify-center cursor-pointer hover:bg-[#2d2d2d] transition-colors"><MousePointer2 className="w-4 h-4 text-amber-500" /></div>
-           <div className="bg-[#252526] border border-black/40 p-2 rounded-lg shadow-lg flex items-center justify-center cursor-pointer hover:bg-[#2d2d2d] transition-colors"><Move className="w-4 h-4 text-gray-400" /></div>
+          <h1 className="text-[15px] font-bold text-gray-900 tracking-tight">AutoFlow Builder</h1>
         </div>
 
-        {/* React Flow Canvas */}
-        <div className="absolute inset-0 z-0">
+        {/* Right: Controls */}
+        <div className="flex items-center gap-3">
+          {/* Customization Mode Toggle */}
+          <button
+            onClick={() => setCustomizationMode(!customizationMode)}
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold border-2 transition-all duration-300 ${
+              customizationMode
+                ? 'border-purple-400 bg-purple-50 text-purple-700 shadow-md shadow-purple-100'
+                : 'border-gray-300 bg-white text-gray-500 hover:border-gray-400'
+            }`}
+          >
+            <span className={`w-2 h-2 rounded-full transition-colors ${customizationMode ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
+            <Settings size={14} className={customizationMode ? 'text-purple-500' : 'text-gray-400'} />
+            Customization Mode: {customizationMode ? 'ON' : 'OFF'}
+          </button>
+
+          {/* Test Logic Button */}
+          <button className="flex items-center gap-1.5 bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm">
+            <Play size={14} fill="currentColor" />
+            Test Logic
+          </button>
+
+          {/* Deploy Button */}
+          <button
+            onClick={() => navigate('/deploy-agent')}
+            className="flex items-center gap-1.5 bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm"
+          >
+            <Rocket size={14} />
+            Deploy
+          </button>
+        </div>
+      </div>
+
+      {/* ── Main Content ──────────────────────────────── */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Left Sidebar — AI Chat */}
+        <div className="w-[320px] shrink-0 border-r border-gray-200 flex flex-col bg-white z-20">
+          {/* Sidebar Header */}
+          <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/80">
+            <h2 className="text-sm font-bold text-gray-800">AI Assistant</h2>
+          </div>
+
+          {/* Chat Interface */}
+          <div className="flex-1 overflow-hidden">
+            <ChatInterface onWorkflowGenerated={handleWorkflowGenerated} />
+          </div>
+        </div>
+
+        {/* Center — React Flow Canvas */}
+        <div className="flex-1 relative">
           <ReactFlowProvider>
             <WorkflowGraph workflowData={workflowData} />
           </ReactFlowProvider>
         </div>
 
-      </main>
-
-      {/* ── RIGHT PANEL: Sandbox & Insights ──────────────────────────────── */}
-      <aside className="w-[380px] border-l border-black/40 bg-[#121212] shrink-0 flex flex-col z-20 shadow-[-10px_0_20px_rgba(0,0,0,0.3)]">
-        {/* Tabs */}
-        <div className="flex border-b border-white/10 text-xs shrink-0">
-          <button 
-            onClick={() => setActiveTab('chat')} 
-            className={`flex-1 py-4 font-semibold transition-colors ${activeTab === 'chat' ? 'text-amber-500 border-b-2 border-amber-500' : 'text-gray-400 hover:text-white'}`}
-          >
-            AI Insight Builder
-          </button>
-          <button 
-            onClick={() => setActiveTab('settings')} 
-            className={`flex-1 py-4 font-semibold transition-colors ${activeTab === 'settings' ? 'text-amber-500 border-b-2 border-amber-500' : 'text-gray-400 hover:text-white'}`}
-          >
-            Settings
-          </button>
+        {/* Right Sidebar — Toolbox (only when Customization Mode is ON) */}
+        <div
+          className={`shrink-0 transition-all duration-300 ease-in-out overflow-hidden ${
+            customizationMode ? 'w-[280px] opacity-100' : 'w-0 opacity-0'
+          }`}
+        >
+          {customizationMode && <NodePalette />}
         </div>
-
-        {activeTab === 'chat' && (
-          <div className="flex-1 flex flex-col overflow-hidden">
-             {/* The existing functional Chat Interface */}
-             <ChatInterface onWorkflowGenerated={handleWorkflowGenerated} />
-          </div>
-        )}
-
-        {activeTab === 'settings' && (
-          <div className="flex-1 overflow-y-auto p-5 bg-[#0d0d0d] space-y-6">
-             <div className="text-gray-400 text-xs">Workflow settings and properties will appear here.</div>
-          </div>
-        )}
-      </aside>
+      </div>
     </div>
   );
 }
