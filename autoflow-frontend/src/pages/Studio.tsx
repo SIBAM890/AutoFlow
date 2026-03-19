@@ -4,8 +4,10 @@ import { ReactFlowProvider } from 'reactflow';
 import { WorkflowGraph } from '../components/visualization/WorkflowGraph';
 import { ChatInterface } from '../components/builder/ChatInterface';
 import { NodePalette } from '../components/builder/NodePalette';
-import { Play, Download, Settings, MousePointer2, Move, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Play, Download, Settings, MousePointer2, Move, ChevronLeft, ChevronRight, Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Modal } from '../components/ui/Modal';
+import { TestMode } from '../components/simulation/TestMode';
 import 'reactflow/dist/style.css';
 
 export default function Studio() {
@@ -13,6 +15,7 @@ export default function Studio() {
   const [activeTab, setActiveTab] = useState("chat"); // 'chat' | 'settings'
   const [isLeftOpen, setIsLeftOpen] = useState(true);
   const [isRightOpen, setIsRightOpen] = useState(true);
+  const [isTestOpen, setIsTestOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleWorkflowGenerated = (workflow) => {
@@ -68,6 +71,12 @@ export default function Studio() {
           </div>
           
           <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setIsTestOpen(true)}
+              className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 text-amber-500 rounded font-medium text-xs transition-colors animate-pulse"
+            >
+              <Smartphone className="w-3.5 h-3.5" /> Test Automation
+            </button>
             <button className="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 hover:bg-white/10 text-gray-300 rounded font-medium text-xs transition-colors">
               <Download className="w-3.5 h-3.5" /> Export
             </button>
@@ -126,6 +135,15 @@ export default function Studio() {
           </div>
         )}
       </aside>
+
+      {/* ── TEST MODAL ──────────────────────────────── */}
+      <Modal 
+        isOpen={isTestOpen} 
+        onClose={() => setIsTestOpen(false)}
+        title="Testing & Execution Phase"
+      >
+        <TestMode />
+      </Modal>
     </div>
   );
 }

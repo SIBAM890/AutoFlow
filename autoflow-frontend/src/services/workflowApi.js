@@ -1,7 +1,15 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:8000/api',
+    baseURL: 'http://localhost:3000/api',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+// Separate instance for WhatsApp Bridge (Port 3001)
+const whatsappApi = axios.create({
+    baseURL: 'http://localhost:3001',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -10,7 +18,7 @@ const api = axios.create({
 export const workflowApi = {
     // Generate a workflow from a text description
     generate: async (description, fileContext = null) => {
-        const response = await api.post('/workflow/generate', { nl_input: description });
+        const response = await api.post('/generate-workflow', { nl_input: description });
         return response.data;
     },
 
@@ -26,13 +34,28 @@ export const workflowApi = {
 
     // Explain a workflow JSON
     explain: async (workflow) => {
-        const response = await api.post('/workflow/explain', { workflow });
+        const response = await api.post('/explain-workflow', { workflow });
         return response.data;
     },
 
-    // Simulate a message to test the engine
     simulate: async (message) => {
-        const response = await api.post('/whatsapp/incoming', { from: 'simulator', message });
+        const response = await api.post('/simulate-message', { message });
+        return response.data;
+    },
+
+    // WhatsApp Bridge (Using Port 3001 and specific bridge routes)
+    getStatus: async () => {
+        const response = await whatsappApi.get('/status');
+        return response.data;
+    },
+
+    deploy: async () => {
+        const response = await whatsappApi.post('/deploy');
+        return response.data;
+    },
+
+    logout: async () => {
+        const response = await whatsappApi.post('/logout');
         return response.data;
     },
 };
