@@ -1,12 +1,10 @@
-version: '3.8'
-
 services:
   frontend:
-    build: ./frontend
+    build: ./autoflow-frontend
     ports: ["3000:3000"]
     depends_on: [backend]
     volumes:
-      - ./frontend:/app
+      - ./autoflow-frontend:/app
       - /app/node_modules
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]

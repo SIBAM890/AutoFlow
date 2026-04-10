@@ -65,6 +65,27 @@ async def api_generate_workflow(request: WorkflowGenerateRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/api/workflow/explain")
+async def api_explain_workflow(workflow: dict):
+    try:
+        explanation = await explain_workflow(workflow)
+        return {"success": True, "explanation": explanation}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/workflow/simulate")
+async def api_simulate_workflow(payload: dict):
+    try:
+        message = payload.get("message", "")
+        # Mocking the AI detection for simulation
+        return {
+            "success": True, 
+            "intent": "Simulated Interaction", 
+            "reply": f"Hello! The engine received your test message: '{message}'.\nIn a live environment, this would execute the mapped workflow nodes."
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/whatsapp/incoming")
 async def api_whatsapp_incoming(payload: dict, background_tasks: BackgroundTasks, db: Session = Depends(get_session)):
     """

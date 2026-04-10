@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = 3001;
-const WEBHOOK_URL = process.env.WEBHOOK_URL || 'http://backend:8000/api/whatsapp/incoming';
+const WEBHOOK_URL = process.env.WEBHOOK_URL || 'http://localhost:8000/api/whatsapp/incoming';
 const AUTH_DIR = '/app/auth_info_baileys';
 
 // ─── Global State ────────────────────────────────────────
